@@ -26,6 +26,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def root():
     return FileResponse("static/index.html")
 
+@app.get("/static/sw.js")
+async def sw():
+    return FileResponse("static/sw.js", media_type="application/javascript")
+
+@app.get("/static/manifest.json")
+async def manifest():
+    return FileResponse("static/manifest.json", media_type="application/json")
+
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
     if not OPENAI_KEY:

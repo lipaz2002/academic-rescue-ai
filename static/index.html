@@ -7,6 +7,12 @@
 <meta name="theme-color" content="#0a0a0f">
 <title>AcademicRescue AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="manifest" href="/static/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AcademicRescue">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<link rel="icon" type="image/png" href="/static/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script>
 window.MathJax = {
@@ -617,6 +623,49 @@ function st(msg,type){var e=document.getElementById('status');e.textContent=msg;
 function resetBtn(){var b=document.getElementById('recBtn');b.className='rec-btn idle';b.textContent='🎬  התחל שיעור';}
 function showLoading(text,sub){var o=document.getElementById('loadingOverlay');document.getElementById('loadingText').textContent=text;document.getElementById('loadingSub').textContent=sub;o.className='loading-overlay show';}
 function hideLoading(){document.getElementById('loadingOverlay').className='loading-overlay';}
+</script>
+<div id="installBanner" style="display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:#111118;border:1px solid rgba(0,217,126,0.3);border-radius:12px;padding:12px 20px;z-index:9999;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+  <span style="font-size:24px">🎓</span>
+  <div>
+    <div style="font-size:13px;font-weight:700;color:#f0f0f5;">התקן כאפליקציה</div>
+    <div style="font-size:11px;color:#55556a;">גישה מהירה מהמסך הראשי</div>
+  </div>
+  <button onclick="installApp()" style="background:#00d97e;color:#001a0e;border:none;border-radius:8px;padding:8px 16px;font-family:Heebo,sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-right:8px;">התקן</button>
+  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:none;border:none;color:#55556a;cursor:pointer;font-size:18px;">×</button>
+</div>
+
+<script>
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/static/sw.js').then(function(reg) {
+      console.log('SW registered');
+    }).catch(function(e) {
+      console.warn('SW failed:', e);
+    });
+  });
+}
+
+// PWA install prompt
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'flex';
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(result) {
+    deferredPrompt = null;
+    document.getElementById('installBanner').style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', function() {
+  document.getElementById('installBanner').style.display = 'none';
+});
 </script>
 </body>
 </html>
