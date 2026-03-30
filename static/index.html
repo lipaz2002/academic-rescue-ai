@@ -779,5 +779,50 @@ function resetBtn() {
 }
 </script>
 <input type="file" id="fileInput" accept="audio/*,video/*,.mp4,.mp3,.wav,.m4a,.webm" style="display:none" onchange="handleFileUpload(this)">
+
+<div id="ib" style="display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);width:calc(100% - 2rem);max-width:420px;background:#111118;border:1px solid rgba(0,217,126,0.3);border-radius:14px;padding:16px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+  <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+    <div style="font-size:14px;font-weight:700;color:#f0f0f5;">🎓 התקן כאפליקציה</div>
+    <button onclick="document.getElementById('ib').style.display='none'" style="background:none;border:none;color:#55556a;cursor:pointer;font-size:20px;">×</button>
+  </div>
+  <div id="ib-chrome" style="display:none">
+    <button onclick="doInstall()" style="width:100%;background:#00d97e;color:#001a0e;border:none;border-radius:8px;padding:12px;font-family:Heebo,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">התקן עכשיו</button>
+  </div>
+  <div id="ib-ios" style="display:none;background:#1a1a24;border-radius:10px;padding:14px;font-size:13px;color:#9090aa;line-height:2;">
+    <div style="color:#00d97e;font-weight:700;margin-bottom:4px;">3 צעדים להתקנה ב-iPhone:</div>
+    <div>① לחץ <strong style="color:white">□↑</strong> בתחתית Safari</div>
+    <div>② בחר <strong style="color:white">"הוסף למסך הבית"</strong></div>
+    <div>③ לחץ <strong style="color:#00d97e">"הוסף"</strong> — זהו!</div>
+  </div>
+</div>
+<script>
+var _dp;
+var _ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+var _standalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+if (!_standalone) {
+  if (_ios) {
+    setTimeout(function() {
+      document.getElementById('ib').style.display = 'block';
+      document.getElementById('ib-ios').style.display = 'block';
+    }, 3000);
+  }
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault(); _dp = e;
+    document.getElementById('ib').style.display = 'block';
+    document.getElementById('ib-chrome').style.display = 'block';
+  });
+}
+
+function doInstall() {
+  if (!_dp) return;
+  _dp.prompt();
+  _dp.userChoice.then(function() { _dp = null; document.getElementById('ib').style.display = 'none'; });
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js').catch(function(){});
+}
+</script>
 </body>
 </html>
