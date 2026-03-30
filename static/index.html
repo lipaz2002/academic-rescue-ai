@@ -2,670 +2,782 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0a0a0f">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net https://api.openai.com; img-src 'self' data: blob:; media-src 'self' blob:;">
 <title>AcademicRescue AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="manifest" href="/static/manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="AcademicRescue">
-<link rel="apple-touch-icon" href="/static/icon-192.png">
-<link rel="icon" type="image/png" href="/static/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script>
 window.MathJax = {
-  tex: { inlineMath:[['$','$']], displayMath:[['$$','$$']], processEscapes:true },
-  startup: { typeset:false }
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] },
+  startup: { typeset: false }
 };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 <style>
 :root {
-  --bg:#0a0a0f; --bg2:#111118; --bg3:#1a1a24;
-  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
-  --green:#00d97e; --green-dim:rgba(0,217,126,0.1); --green-glow:rgba(0,217,126,0.2);
-  --red:#ff4757; --purple:#7c6af7; --purple-dim:rgba(124,106,247,0.1);
-  --amber:#ffa726; --amber-dim:rgba(255,167,38,0.08);
-  --text:#f0f0f5; --text2:#9090aa; --text3:#55556a;
+  --bg: #0a0a0f; --bg2: #111118; --bg3: #1a1a24; --bg4: #222230;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+  --green: #00d97e; --green-dim: rgba(0,217,126,0.1); --green-glow: rgba(0,217,126,0.2);
+  --red: #ff4757; --red-dim: rgba(255,71,87,0.1);
+  --purple: #7c6af7; --purple-dim: rgba(124,106,247,0.1);
+  --amber: #ffa726; --amber-dim: rgba(255,167,38,0.08);
+  --text: #f0f0f5; --text2: #9090aa; --text3: #55556a;
+  --r: 12px; --r-sm: 8px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,126,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,126,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-app-region: no-drag; }
+body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,217,126,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,217,126,0.025) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
 
-/* Nav */
-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
-.nav-logo{font-size:18px;font-weight:900;}
-.nav-logo span{color:var(--green);}
-.nav-tagline{font-size:11px;color:var(--text3);display:none;}
-@media(min-width:600px){.nav-tagline{display:block;}}
+.titlebar { height: 38px; -webkit-app-region: drag; background: var(--bg); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); position: relative; z-index: 10; }
+.titlebar-title { font-size: 13px; font-weight: 600; color: var(--text3); letter-spacing: 0.3px; }
 
-/* Layout */
-.app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:1.5rem 1rem;}
+.layout { display: flex; flex: 1; overflow: hidden; position: relative; z-index: 1; }
 
-/* Cards */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;transition:border-color 0.2s;}
+/* Sidebar */
+.sidebar { width: 260px; min-width: 260px; background: var(--bg2); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; padding: 1.25rem 1rem; }
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-/* Mode selector */
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
-@media(min-width:600px){.modes{grid-template-columns:repeat(4,1fr);}}
-.mode-btn{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:14px 10px;cursor:pointer;transition:all 0.2s;text-align:center;user-select:none;}
-.mode-btn:hover{border-color:var(--border2);}
-.mode-btn.sel{border-color:var(--green);background:var(--green-dim);}
-.mode-icon{font-size:24px;margin-bottom:6px;}
-.mode-title{font-size:12px;font-weight:700;color:var(--text);}
-.mode-desc{font-size:10px;color:var(--text3);margin-top:2px;}
+.main { flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.main::-webkit-scrollbar { width: 4px; }
+.main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-/* Info banner */
-.info-banner{background:rgba(0,217,126,0.07);border:1px solid rgba(0,217,126,0.2);border-radius:10px;padding:12px 14px;margin-bottom:1rem;font-size:12px;color:var(--text2);line-height:1.6;display:none;}
-.info-banner.show{display:block;}
-.info-banner strong{color:var(--green);}
+.logo { margin-bottom: 1.5rem; }
+.logo-name { font-size: 18px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; }
+.logo-name span { color: var(--green); }
+.logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-/* Upload zone */
-.upload-zone{border:2px dashed var(--border2);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:1rem;display:none;}
-.upload-zone.show{display:block;}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--green);background:var(--green-dim);}
-.upload-icon{font-size:36px;margin-bottom:10px;}
-.upload-text{font-size:14px;color:var(--text2);}
-.upload-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.field-group { margin-bottom: 1.25rem; }
+.field-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.field-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 9px 11px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); direction: ltr; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.field-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-dim); }
+.field-input::placeholder { color: var(--text3); }
 
-/* Record button */
-.rec-btn{width:100%;padding:16px;border:none;border-radius:10px;font-family:'Heebo',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
-.rec-btn.idle{background:var(--green);color:#001a0e;box-shadow:0 4px 24px var(--green-glow);}
-.rec-btn.idle:hover{transform:translateY(-1px);box-shadow:0 6px 32px var(--green-glow);}
-.rec-btn.rec{background:var(--red);color:white;animation:recPulse 2s infinite;}
-.rec-btn.loading{background:var(--bg3);color:var(--text3);cursor:not-allowed;border:1px solid var(--border);}
-@keyframes recPulse{0%,100%{box-shadow:0 4px 20px rgba(255,71,87,0.3)}50%{box-shadow:0 4px 40px rgba(255,71,87,0.6)}}
+.mode-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.modes { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
+.mode-option { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; cursor: pointer; transition: all 0.2s; }
+.mode-option:hover { border-color: var(--border2); }
+.mode-option.selected { border-color: var(--green); background: var(--green-dim); }
+.mode-icon { font-size: 18px; }
+.mode-info { flex: 1; }
+.mode-title { font-size: 12px; font-weight: 600; color: var(--text); }
+.mode-desc { font-size: 10px; color: var(--text3); margin-top: 1px; }
 
-/* Status */
-.status{text-align:center;font-size:12px;color:var(--text3);min-height:18px;margin-bottom:0.5rem;}
-.status.ok{color:var(--green);}
-.status.err{color:var(--red);}
-.status.proc{color:var(--purple);}
+.source-picker { margin-bottom: 1.25rem; display: none; }
+.source-picker.show { display: block; }
+.source-list { display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; }
+.source-list::-webkit-scrollbar { width: 3px; }
+.source-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.source-item { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 8px 10px; cursor: pointer; transition: all 0.2s; }
+.source-item:hover { border-color: var(--border2); }
+.source-item.selected { border-color: var(--green); background: var(--green-dim); }
+.source-thumb { width: 48px; height: 28px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
+.source-name { font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; }
 
-/* Live indicators */
-.inds{display:flex;gap:6px;margin-bottom:1rem;}
-.ind{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center;transition:all 0.3s;}
-.ind.on{background:var(--green-dim);border-color:rgba(0,217,126,0.25);}
-.ind-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);margin:0 auto 5px;}
-.ind.on .ind-dot{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.2s infinite;}
-.ind-lbl{font-size:10px;color:var(--text3);}
-.ind.on .ind-lbl{color:var(--green);}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.rec-btn { width: 100%; padding: 12px; border: none; border-radius: var(--r-sm); font-family: 'Heebo', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 8px; }
+.rec-btn.idle { background: var(--green); color: #001a0e; box-shadow: 0 4px 20px var(--green-glow); }
+.rec-btn.idle:hover { transform: translateY(-1px); box-shadow: 0 6px 28px var(--green-glow); }
+.rec-btn.recording { background: var(--red); color: white; animation: recPulse 2s ease infinite; }
+.rec-btn.loading { background: var(--bg3); color: var(--text3); cursor: not-allowed; border: 1px solid var(--border); }
+@keyframes recPulse { 0%,100%{box-shadow:0 4px 20px rgba(255,71,87,0.3)} 50%{box-shadow:0 4px 36px rgba(255,71,87,0.6)} }
 
-/* Waveform */
-.wave{display:none;justify-content:center;align-items:center;gap:3px;height:40px;margin:0.5rem 0;}
-.wave.show{display:flex;}
-.wbar{width:4px;background:var(--green);border-radius:2px;height:3px;transition:height 0.05s;}
+.status-text { font-size: 11px; text-align: center; color: var(--text3); min-height: 16px; transition: color 0.3s; }
+.status-text.ok { color: var(--green); }
+.status-text.err { color: var(--red); }
+.status-text.proc { color: var(--purple); }
 
-/* Timer */
-.timer{font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:600;color:var(--red);text-align:center;letter-spacing:4px;display:none;margin:0.5rem 0;}
-.timer.show{display:block;}
+.indicators { display: flex; gap: 5px; margin-bottom: 1rem; }
+.ind { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 7px 5px; text-align: center; transition: all 0.3s; }
+.ind.on { background: var(--green-dim); border-color: rgba(0,217,126,0.25); }
+.ind-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); margin: 0 auto 4px; transition: all 0.3s; }
+.ind.on .ind-dot { background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 1.2s ease infinite; }
+.ind-lbl { font-size: 9px; color: var(--text3); transition: color 0.3s; }
+.ind.on .ind-lbl { color: var(--green); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-/* Progress */
-.progress{display:flex;gap:4px;margin-bottom:1rem;direction:ltr;}
-.prog{flex:1;padding:8px 4px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;text-align:center;font-size:10px;color:var(--text3);transition:all 0.3s;}
-.prog.done{background:var(--green-dim);color:var(--green);}
-.prog.active{background:var(--purple-dim);color:var(--purple);font-weight:600;}
+.timer-display { font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 600; color: var(--red); text-align: center; letter-spacing: 3px; display: none; }
+.timer-display.show { display: block; animation: fadeUp 0.3s ease; }
 
-/* Summary */
-.sum-header{background:linear-gradient(135deg,rgba(0,217,126,0.07),rgba(124,106,247,0.07));border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1rem;}
-.sum-title{font-size:22px;font-weight:900;margin-bottom:6px;}
-.sum-meta{font-size:11px;color:var(--text3);display:flex;gap:16px;flex-direction:row-reverse;flex-wrap:wrap;}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0.75rem 0;}
-.chip{background:var(--purple-dim);border:1px solid rgba(124,106,247,0.2);color:var(--purple);font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;}
+.waveform { display: none; justify-content: center; align-items: center; gap: 3px; height: 32px; margin: 0.5rem 0; }
+.waveform.show { display: flex; }
+.wbar { width: 3px; background: var(--green); border-radius: 2px; height: 3px; transition: height 0.05s ease; }
 
-.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
-.sec-body{font-size:14px;color:var(--text2);line-height:1.9;}
+.progress { display: flex; gap: 4px; margin-bottom: 1rem; direction: ltr; }
+.prog { flex: 1; padding: 6px 2px; background: var(--bg3); border: 1px solid var(--border); border-radius: 5px; text-align: center; font-size: 9px; color: var(--text3); transition: all 0.3s; }
+.prog.done { background: var(--green-dim); border-color: rgba(0,217,126,0.2); color: var(--green); }
+.prog.active { background: var(--purple-dim); border-color: rgba(124,106,247,0.2); color: var(--purple); }
 
-.formula-card{background:rgba(124,106,247,0.07);border:1px solid rgba(124,106,247,0.18);border-radius:10px;padding:14px;margin-bottom:10px;}
-.formula-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.formula-name{font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;}
-.formula-src{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.06);}
-.src-s{color:var(--green);}.src-b{color:var(--amber);}.src-v{color:var(--purple);}
-.formula-latex{font-size:15px;color:var(--text);text-align:center;padding:10px 0;direction:ltr;}
-.formula-meaning{font-size:12px;color:var(--text3);margin-top:8px;}
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; animation: fadeUp 0.4s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
-.ex-problem{background:var(--bg3);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--text2);margin-bottom:14px;}
-.ex-steps{display:flex;flex-direction:column;gap:10px;}
-.ex-step{display:flex;gap:12px;align-items:flex-start;}
-.ex-n{width:26px;height:26px;min-width:26px;background:var(--green-dim);border:1px solid rgba(0,217,126,0.3);border-radius:50%;font-size:12px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;}
-.ex-desc{font-size:13px;color:var(--text2);line-height:1.6;}
-.ex-formula{font-size:14px;color:var(--text);background:var(--bg3);border-radius:6px;padding:6px 12px;direction:ltr;text-align:center;margin-top:6px;}
-.ex-answer{background:var(--green-dim);border:1px solid rgba(0,217,126,0.3);border-radius:8px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--green);margin-top:12px;}
+.sec-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
 
-.hl-box{background:var(--amber-dim);border:1px solid rgba(255,167,38,0.15);border-radius:10px;padding:14px;}
-.hl-pt{font-size:14px;color:var(--text2);padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.hl-pt:last-child{border-bottom:none;}
+.transcript-text { font-size: 13px; color: var(--text2); line-height: 1.8; max-height: 130px; overflow-y: auto; direction: rtl; }
+.transcript-text::-webkit-scrollbar { width: 3px; }
+.transcript-text::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-.transcript{font-size:13px;color:var(--text2);line-height:1.8;max-height:140px;overflow-y:auto;}
+.sum-header { background: linear-gradient(135deg, rgba(0,217,126,0.06), rgba(124,106,247,0.06)); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 1.25rem; margin-bottom: 1rem; }
+.sum-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.sum-meta { font-size: 11px; color: var(--text3); display: flex; gap: 14px; flex-direction: row-reverse; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 0.75rem 0; direction: rtl; }
+.chip { background: var(--purple-dim); border: 1px solid rgba(124,106,247,0.18); color: var(--purple); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
 
-/* Action buttons */
-.act-row{display:flex;gap:8px;flex-wrap:wrap;}
-.act-btn{padding:11px 16px;border-radius:8px;border:1.5px solid;background:transparent;font-family:'Heebo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
-.act-btn.g{border-color:var(--green);color:var(--green);}
-.act-btn.g:hover{background:var(--green-dim);}
-.act-btn.p{border-color:var(--purple);color:var(--purple);}
-.act-btn.p:hover{background:var(--purple-dim);}
-.act-btn.a{border-color:var(--amber);color:var(--amber);}
-.act-btn.a:hover{background:var(--amber-dim);}
+.sum-section { margin-bottom: 1.5rem; }
+.sum-sec-title { font-size: 11px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+.sum-sec-body { font-size: 14px; color: var(--text2); line-height: 1.9; direction: rtl; }
 
-/* Empty state */
-.empty{padding:4rem 2rem;text-align:center;color:var(--text3);}
-.empty-icon{font-size:56px;opacity:0.25;margin-bottom:1rem;}
-.empty-title{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--text2);}
-.empty-sub{font-size:13px;line-height:1.6;}
+.formula-card { background: rgba(124,106,247,0.07); border: 1px solid rgba(124,106,247,0.18); border-radius: var(--r-sm); padding: 14px; margin-bottom: 10px; }
+.formula-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.formula-name { font-size: 11px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.5px; }
+.formula-source { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(255,255,255,0.06); }
+.src-screen { color: var(--green); } .src-both { color: var(--amber); } .src-voice { color: var(--purple); }
+.formula-latex { font-size: 15px; color: var(--text); text-align: center; padding: 10px 0; direction: ltr; }
+.formula-meaning { font-size: 12px; color: var(--text3); margin-top: 6px; direction: rtl; }
 
-/* Loading overlay */
-.loading-overlay{position:fixed;inset:0;background:rgba(10,10,15,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;display:none;}
-.loading-overlay.show{display:flex;}
-.loading-spinner{width:48px;height:48px;border:3px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:1rem;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:16px;color:var(--text2);}
-.loading-sub{font-size:12px;color:var(--text3);margin-top:6px;}
+.ex-problem { background: var(--bg3); border-radius: var(--r-sm); padding: 11px 13px; font-size: 13px; color: var(--text2); margin-bottom: 12px; direction: rtl; }
+.ex-steps { display: flex; flex-direction: column; gap: 10px; }
+.ex-step { display: flex; gap: 10px; align-items: flex-start; }
+.ex-step-n { width: 24px; height: 24px; min-width: 24px; background: var(--green-dim); border: 1px solid rgba(0,217,126,0.25); border-radius: 50%; font-size: 11px; font-weight: 700; color: var(--green); display: flex; align-items: center; justify-content: center; }
+.ex-step-desc { font-size: 13px; color: var(--text2); direction: rtl; }
+.ex-step-formula { font-size: 13px; color: var(--text); background: var(--bg3); border-radius: 5px; padding: 5px 10px; direction: ltr; text-align: center; margin-top: 4px; }
+.ex-answer { background: var(--green-dim); border: 1px solid rgba(0,217,126,0.25); border-radius: var(--r-sm); padding: 11px 13px; font-size: 13px; font-weight: 600; color: var(--green); margin-top: 10px; direction: rtl; }
 
-/* Mobile responsive */
-@media(max-width:600px){
-  .app{padding:1rem 0.75rem;}
-  .card{padding:1.25rem;}
-  .sum-title{font-size:18px;}
-  .timer{font-size:36px;}
-  .act-btn{font-size:12px;padding:9px 12px;}
-}
+.hl-section { background: var(--amber-dim); border: 1px solid rgba(255,167,38,0.15); border-radius: var(--r-sm); padding: 14px; }
+.hl-section .sum-sec-title { color: var(--amber); }
+.hl-point { font-size: 13px; color: var(--text2); padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); direction: rtl; }
+.hl-point:last-child { border-bottom: none; }
 
-/* Scrollbar */
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.action-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.action-btn { padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid; background: transparent; font-family: 'Heebo', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+.action-btn.green { border-color: var(--green); color: var(--green); }
+.action-btn.green:hover { background: var(--green-dim); }
+.action-btn.purple { border-color: var(--purple); color: var(--purple); }
+.action-btn.purple:hover { background: var(--purple-dim); }
+.action-btn.amber { border-color: var(--amber); color: var(--amber); }
+.action-btn.amber:hover { background: var(--amber-dim); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text3); gap: 10px; }
+.empty-icon { font-size: 48px; opacity: 0.3; }
+.empty-text { font-size: 14px; }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-logo">Academic<span>Rescue</span></div>
-  <div class="nav-tagline">סיכום שיעורים חכם עם AI</div>
-</nav>
-
-<div class="app">
-
-  <!-- Mode selector -->
-  <div class="card">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">מה אתה רוצה לסכם?</div>
-    <div class="modes">
-      <div class="mode-btn" id="mb-file" onclick="setMode('file')">
-        <div class="mode-icon">📁</div>
-        <div class="mode-title">העלאת קובץ</div>
-        <div class="mode-desc">MP4, MP3, WAV</div>
-      </div>
-      <div class="mode-btn" id="mb-recording" onclick="setMode('recording')">
-        <div class="mode-icon">🎬</div>
-        <div class="mode-title">הקלטה שמורה</div>
-        <div class="mode-desc">מסך + סאונד</div>
-      </div>
-      <div class="mode-btn" id="mb-live" onclick="setMode('live')">
-        <div class="mode-icon">📡</div>
-        <div class="mode-title">שיעור חי</div>
-        <div class="mode-desc">זום פתוח</div>
-      </div>
-      <div class="mode-btn" id="mb-class" onclick="setMode('class')">
-        <div class="mode-icon">🏫</div>
-        <div class="mode-title">כיתה פיזית</div>
-        <div class="mode-desc">מיקרופון</div>
-      </div>
-    </div>
-
-    <!-- Info banner -->
-    <div class="info-banner" id="infoBanner">
-      <strong>🧠 זיהוי חכם:</strong> האפליקציה מצלמת מסך אוטומטית כשמזהה "תרגיל", "דוגמה", "נסתכל" ועוד. בסיכום — כל נוסחה מוצלבת עם הצילום מאותה שנייה.
-    </div>
-
-    <!-- Upload zone -->
-    <div class="upload-zone" id="uploadZone"
-      ondragover="e.preventDefault();this.classList.add('drag')"
-      ondragleave="this.classList.remove('drag')"
-      ondrop="onDrop(event)"
-      onclick="document.getElementById('fileInput').click()">
-      <div class="upload-icon">📎</div>
-      <div class="upload-text">גרור קובץ לכאן או לחץ לבחירה</div>
-      <div class="upload-sub">MP4 · MP3 · WAV · M4A · WEBM</div>
-    </div>
-    <input type="file" id="fileInput" accept="audio/*,video/*" style="display:none" onchange="onFileSelected(this)">
-
-    <!-- Indicators -->
-    <div class="inds" id="inds" style="display:none">
-      <div class="ind" id="iA"><div class="ind-dot"></div><div class="ind-lbl" id="iAL">סאונד</div></div>
-      <div class="ind" id="iS"><div class="ind-dot"></div><div class="ind-lbl">מסך</div></div>
-      <div class="ind" id="iC"><div class="ind-dot"></div><div class="ind-lbl" id="iCL">0 צילומים</div></div>
-    </div>
-
-    <!-- Waveform -->
-    <div class="wave" id="wave">
-      <div class="wbar" id="w0"></div><div class="wbar" id="w1"></div><div class="wbar" id="w2"></div>
-      <div class="wbar" id="w3"></div><div class="wbar" id="w4"></div><div class="wbar" id="w5"></div>
-      <div class="wbar" id="w6"></div><div class="wbar" id="w7"></div><div class="wbar" id="w8"></div>
-      <div class="wbar" id="w9"></div><div class="wbar" id="w10"></div><div class="wbar" id="w11"></div>
-    </div>
-
-    <!-- Timer -->
-    <div class="timer" id="timer">00:00</div>
-
-    <!-- Progress -->
-    <div class="progress" id="progress" style="display:none">
-      <div class="prog" id="s1">🎬 הקלטה</div>
-      <div class="prog" id="s2">📝 תמלול</div>
-      <div class="prog" id="s3">👁 מסך</div>
-      <div class="prog" id="s4">🧠 סיכום</div>
-      <div class="prog" id="s5">✅ מוכן</div>
-    </div>
-
-    <!-- Record button -->
-    <button class="rec-btn idle" id="recBtn" onclick="toggleRec()" style="display:none">🎬  התחל שיעור</button>
-    <div class="status" id="status">בחר מצב כדי להתחיל</div>
-  </div>
-
-  <!-- Output -->
-  <div id="output">
-    <div class="empty">
-      <div class="empty-icon">🎓</div>
-      <div class="empty-title">מוכן לסכם</div>
-      <div class="empty-sub">בחר מצב למעלה והתחל.<br>הסיכום יופיע כאן תוך דקות.</div>
-    </div>
-  </div>
-
+<div class="titlebar">
+  <span class="titlebar-title">AcademicRescue AI</span>
 </div>
 
-<!-- Loading overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-text" id="loadingText">מעבד...</div>
-  <div class="loading-sub" id="loadingSub"></div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-name">Academic<span>Rescue</span></div>
+      <div class="logo-sub">סיכום שיעורים חכם</div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">OpenAI API Key</div>
+      <input type="password" class="field-input" id="apiKey" placeholder="sk-proj-..." />
+    </div>
+
+    <div class="mode-label">מה אתה מקליט?</div>
+    <div class="modes">
+      <div class="mode-option" id="mode-recording" onclick="setMode('recording')">
+        <div class="mode-icon">🎬</div>
+        <div class="mode-info"><div class="mode-title">הקלטה שמורה</div><div class="mode-desc">גוגל דרייב, מודל, יוטיוב</div></div>
+      </div>
+      <div class="mode-option" id="mode-live" onclick="setMode('live')">
+        <div class="mode-icon">📡</div>
+        <div class="mode-info"><div class="mode-title">שיעור חי בזום</div><div class="mode-desc">אפליקציית Zoom פתוחה</div></div>
+      </div>
+      <div class="mode-option" id="mode-class" onclick="setMode('class')">
+        <div class="mode-icon">🏫</div>
+        <div class="mode-info"><div class="mode-title">כיתה פיזית</div><div class="mode-desc">מיקרופון מקליט את המרצה</div></div>
+      </div>
+      <div class="mode-option" id="mode-file" onclick="setMode('file')">
+        <div class="mode-icon">📁</div>
+        <div class="mode-info"><div class="mode-title">העלאת קובץ</div><div class="mode-desc">MP4, MP3, WAV, M4A</div></div>
+      </div>
+    </div>
+
+    <div class="source-picker" id="sourcePicker">
+      <div class="field-label">בחר חלון לצלם</div>
+      <div class="source-list" id="sourceList"></div>
+      <div style="margin-top:6px">
+        <button onclick="refreshSources()" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:4px 0;">↻ רענן</button>
+      </div>
+    </div>
+
+    <div class="indicators">
+      <div class="ind" id="indA"><div class="ind-dot"></div><div class="ind-lbl" id="indALbl">סאונד</div></div>
+      <div class="ind" id="indS"><div class="ind-dot"></div><div class="ind-lbl">מסך</div></div>
+      <div class="ind" id="indC"><div class="ind-dot"></div><div class="ind-lbl" id="indCLbl">0 צילומים</div></div>
+    </div>
+
+    <div class="waveform" id="waveform">
+      <div class="wbar" id="wb0"></div><div class="wbar" id="wb1"></div><div class="wbar" id="wb2"></div>
+      <div class="wbar" id="wb3"></div><div class="wbar" id="wb4"></div><div class="wbar" id="wb5"></div>
+      <div class="wbar" id="wb6"></div><div class="wbar" id="wb7"></div><div class="wbar" id="wb8"></div>
+      <div class="wbar" id="wb9"></div><div class="wbar" id="wb10"></div><div class="wbar" id="wb11"></div>
+    </div>
+
+    <div class="timer-display" id="timer">00:00</div>
+
+    <div class="progress">
+      <div class="prog" id="s1">🎬</div>
+      <div class="prog" id="s2">📝</div>
+      <div class="prog" id="s3">👁</div>
+      <div class="prog" id="s4">🧠</div>
+      <div class="prog" id="s5">✅</div>
+    </div>
+
+    <button class="rec-btn idle" id="recBtn" onclick="toggleRec()">🎬  התחל שיעור</button>
+    <div class="status-text" id="status">בחר מצב והתחל</div>
+  </div>
+
+  <div class="main" id="mainContent">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🎓</div>
+      <div class="empty-text">הסיכום יופיע כאן</div>
+    </div>
+  </div>
 </div>
 
 <script>
-var API_BASE = window.location.origin;
-var mode = null, rec = false, mr = null, chunks = [], shots = [], shotInt = null;
-var timerInt = null, secs = 0, videoEl = null, actx = null, anlz = null, af = null;
-var audioBuffer = [], triggerCheckInt = null, segments = [], sumData = null, txText = '';
-var lastTriggerTime = 0;
-var TRIGGERS = ['תרגיל','דוגמה','דוגמא','נסתכל','הנה','ניפתור','שאלה','נחשב','נכתוב','נרשום','לדוגמה','למשל','נראה','פתרון','חישוב','נציב','נגזור','נבדוק'];
+let mode = null, selectedSource = null;
+let rec = false, mr = null, chunks = [], shots = [], shotInt = null, timerInt = null, secs = 0;
+let audioCtx = null, analyser = null, animFrame = null;
+let summaryData = null, transcriptText = '';
 
 function setMode(m) {
   mode = m;
-  document.querySelectorAll('.mode-btn').forEach(function(el){ el.classList.remove('sel'); });
-  document.getElementById('mb-'+m).classList.add('sel');
-  var uz = document.getElementById('uploadZone');
-  var rb = document.getElementById('recBtn');
-  var ib = document.getElementById('infoBanner');
-  var inds = document.getElementById('inds');
-  var prog = document.getElementById('progress');
-
-  uz.className = 'upload-zone';
-  rb.style.display = 'none';
-  ib.className = 'info-banner';
-  inds.style.display = 'none';
-  prog.style.display = 'none';
+  document.querySelectorAll('.mode-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('mode-' + m).classList.add('selected');
 
   if (m === 'file') {
-    uz.className = 'upload-zone show';
-    st('בחר קובץ MP4, MP3 או WAV','ok');
+    document.getElementById('sourcePicker').classList.remove('show');
+    // Change record button to file upload
+    document.getElementById('recBtn').textContent = '📁  בחר קובץ שיעור';
+    document.getElementById('recBtn').className = 'rec-btn idle';
+    st('בחר קובץ MP4, MP3 או WAV', 'ok');
+  } else if (m === 'class') {
+    document.getElementById('sourcePicker').classList.remove('show');
+    document.getElementById('recBtn').textContent = '🎬  התחל שיעור';
+    st('לחץ התחל — יבקש הרשאת מיקרופון', 'ok');
   } else {
-    rb.style.display = 'block';
-    inds.style.display = 'flex';
-    prog.style.display = 'flex';
-    if (m !== 'class') ib.className = 'info-banner show';
-    st('לחץ "התחל שיעור" כשאתה מוכן','ok');
+    document.getElementById('sourcePicker').classList.add('show');
+    document.getElementById('recBtn').textContent = '🎬  התחל שיעור';
+    refreshSources();
+    st('בחר חלון מהרשימה', '');
   }
 }
 
-// File upload
-function onDrop(e) {
-  e.preventDefault();
-  document.getElementById('uploadZone').classList.remove('drag');
-  var file = e.dataTransfer.files[0];
-  if (file) processFile(file);
-}
-
-function onFileSelected(input) {
-  var file = input.files[0];
-  if (file) processFile(file);
-  input.value = '';
-}
-
-async function processFile(file) {
-  showLoading('📝 מתמלל קובץ...', file.name);
-  setStep(2);
+async function refreshSources() {
+  const list = document.getElementById('sourceList');
+  list.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:8px">טוען...</div>';
   try {
-    var fd = new FormData();
-    fd.append('file', file, file.name);
-    var r = await fetch(API_BASE+'/transcribe', {method:'POST', body:fd});
-    if (!r.ok) throw new Error(await r.text());
-    var data = await r.json();
-    txText = data.text || '';
-    segments = data.segments || [];
-
-    showLoading('🧠 מסכם...', 'מעבד ' + Math.round(file.size/1024) + 'KB');
-    setStep(4);
-    var sumR = await fetch(API_BASE+'/summarize', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({transcript:txText, screen_text:'', segments:segments, shots_meta:[]})
+    const sources = await window.electronAPI.getSources();
+    list.innerHTML = '';
+    sources.forEach(src => {
+      const el = document.createElement('div');
+      el.className = 'source-item' + (selectedSource?.id === src.id ? ' selected' : '');
+      el.innerHTML = `<img class="source-thumb" src="${src.thumbnail}"><span class="source-name">${src.name}</span>`;
+      el.onclick = () => {
+        selectedSource = src;
+        document.querySelectorAll('.source-item').forEach(s => s.classList.remove('selected'));
+        el.classList.add('selected');
+        st('מוכן — לחץ התחל שיעור', 'ok');
+      };
+      list.appendChild(el);
     });
-    if (!sumR.ok) throw new Error(await sumR.text());
-    sumData = await sumR.json();
-    secs = Math.round(file.size / 16000);
-    hideLoading();
-    setStep(5);
-    renderSummary(sumData, txText, 0);
-    st('הסיכום מוכן! 🎉','ok');
   } catch(e) {
-    hideLoading();
-    st('שגיאה: '+e.message,'err');
+    list.innerHTML = '<div style="font-size:11px;color:var(--red);padding:8px">שגיאה</div>';
   }
 }
 
-// Recording
 async function toggleRec() {
-  if (rec) await stopRec(); else await startRec();
+  if (mode === 'file') {
+    document.getElementById('fileInput').click();
+    return;
+  }
+  if (rec) await stopRec();
+  else await startRec();
 }
 
 async function startRec() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key.startsWith('sk-')) { st('הכנס API Key תקין', 'err'); return; }
+  if (!mode) { st('בחר מצב קודם', 'err'); return; }
+  if (mode !== 'class' && !selectedSource) { st('בחר חלון מהרשימה', 'err'); return; }
+
   try {
-    var audioStream;
+    let audioStream;
+
     if (mode === 'class') {
-      audioStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});
-      document.getElementById('iAL').textContent = 'מיקרופון';
-    } else {
-      var stream = await navigator.mediaDevices.getDisplayMedia({
-        video:{frameRate:1,width:1280,height:720},
-        audio:{echoCancellation:false,noiseSuppression:false}
-      });
-      var aTracks = stream.getAudioTracks();
-      var vTracks = stream.getVideoTracks();
-      if (!aTracks.length) {
-        stream.getTracks().forEach(function(t){t.stop();});
-        st('לא נמצא סאונד — סמן "Share audio" בחלון השיתוף','err');
+      // Physical class: use microphone
+      const ok = await window.electronAPI.checkMic();
+      if (!ok) { st('לא אושרה גישה למיקרופון', 'err'); return; }
+      audioStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
+      document.getElementById('indALbl').textContent = 'מיקרופון';
+
+    } else if (mode === 'recording') {
+      // Recording mode: capture from BlackHole (system audio loopback)
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const blackhole = devices.find(d => d.kind === 'audioinput' && d.label.toLowerCase().includes('blackhole'));
+      if (!blackhole) {
+        st('BlackHole לא נמצא — פתח Audio MIDI Setup והגדר Multi-Output', 'err');
         return;
       }
-      audioStream = new MediaStream(aTracks);
-      document.getElementById('iAL').textContent = mode==='live'?'סאונד זום':'סאונד';
-      if (vTracks.length) {
-        videoEl = document.createElement('video');
-        videoEl.srcObject = new MediaStream(vTracks);
-        videoEl.play();
-        videoEl.onloadedmetadata = function(){
-          shots=[];
-          shotInt = setInterval(function(){ snap(videoEl,'fallback'); },60000);
-          setTimeout(function(){ snap(videoEl,'start'); },2000);
-          setInd('iS',true);
+      audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { exact: blackhole.deviceId }, echoCancellation: false, noiseSuppression: false },
+        video: false
+      });
+      document.getElementById('indALbl').textContent = 'BlackHole ✓';
+
+      // Also capture screenshots from selected window
+      if (selectedSource) {
+        const constraints = {
+          audio: false,
+          video: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: selectedSource.id, minWidth: 1280, maxWidth: 1920 } }
         };
-        vTracks[0].onended = function(){ if(rec) stopRec(); };
-        startTriggerDetection(audioStream);
+        try {
+          const screenStream = await navigator.mediaDevices.getUserMedia(constraints);
+          const videoTrack = screenStream.getVideoTracks()[0];
+          if (videoTrack) {
+            const videoEl = document.createElement('video');
+            videoEl.srcObject = new MediaStream([videoTrack]);
+            videoEl.play();
+            videoEl.onloadedmetadata = () => {
+              shots = [];
+              shotInt = setInterval(() => takeShot(videoEl), 45000);
+              setTimeout(() => takeShot(videoEl), 2000);
+              setInd('indS', true);
+            };
+          }
+        } catch(e) { console.warn('Screen capture failed:', e); }
       }
+
+    } else {
+      // Live zoom: capture desktop audio + screen
+      const constraints = {
+        audio: { mandatory: { chromeMediaSource: 'desktop' } },
+        video: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: selectedSource.id, minWidth: 1280, maxWidth: 1920 } }
+      };
+      const screenStream = await navigator.mediaDevices.getUserMedia(constraints);
+      audioStream = new MediaStream(screenStream.getAudioTracks());
+      const videoTrack = screenStream.getVideoTracks()[0];
+      if (videoTrack) {
+        const videoEl = document.createElement('video');
+        videoEl.srcObject = new MediaStream([videoTrack]);
+        videoEl.play();
+        videoEl.onloadedmetadata = () => {
+          shots = [];
+          shotInt = setInterval(() => takeShot(videoEl), 45000);
+          setTimeout(() => takeShot(videoEl), 2000);
+          setInd('indS', true);
+        };
+      }
+      document.getElementById('indALbl').textContent = 'סאונד זום';
     }
 
-    var mime = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'].find(function(t){return MediaRecorder.isTypeSupported(t);})||'';
-    mr = new MediaRecorder(audioStream, mime?{mimeType:mime}:{});
-    chunks=[];
-    mr.ondataavailable = function(e){ if(e.data.size>0) chunks.push(e.data); };
+    const mime = getSupportedMime();
+    mr = new MediaRecorder(audioStream, mime ? { mimeType: mime } : {});
+    chunks = [];
+    mr.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
     mr.start(1000);
-    setInd('iA',true);
-    startViz(audioStream);
+    setInd('indA', true);
+    startVisualizer(audioStream);
 
-    rec=true; secs=0;
+    rec = true;
     setStep(1);
-    document.getElementById('recBtn').className='rec-btn rec';
-    document.getElementById('recBtn').textContent='⏹  עצור שיעור';
-    document.getElementById('timer').className='timer show';
-    document.getElementById('wave').className='wave show';
-    st('מקליט... לחץ "עצור שיעור" בסיום','ok');
+    document.getElementById('recBtn').className = 'rec-btn recording';
+    document.getElementById('recBtn').textContent = '⏹  עצור שיעור';
+    document.getElementById('timer').className = 'timer-display show';
+    document.getElementById('waveform').className = 'waveform show';
+    st('מקליט...', 'ok');
 
-    timerInt = setInterval(function(){
+    document.getElementById('mainContent').innerHTML = `
+      <div class="card" id="liveCard">
+        <div class="sec-label">מקליט</div>
+        <div style="font-size:13px;color:var(--text2);">האפליקציה קולטת את השיעור. לחץ "עצור שיעור" בסיום.</div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text3);" id="liveStats">אודיו: 0KB · צילומים: 0</div>
+      </div>`;
+
+    secs = 0;
+    timerInt = setInterval(() => {
       secs++;
-      var m=String(Math.floor(secs/60)).padStart(2,'0'),s=String(secs%60).padStart(2,'0');
-      document.getElementById('timer').textContent=m+':'+s;
-    },1000);
+      const m = String(Math.floor(secs/60)).padStart(2,'0'), s = String(secs%60).padStart(2,'0');
+      document.getElementById('timer').textContent = m+':'+s;
+      const kb = Math.round(chunks.reduce((a,c) => a+c.size, 0)/1024);
+      const ls = document.getElementById('liveStats');
+      if (ls) ls.textContent = `אודיו: ${kb}KB · צילומים: ${shots.length}`;
+    }, 1000);
 
   } catch(e) {
-    st(e.name==='NotAllowedError'?'ביטלת — נסה שוב':'שגיאה: '+e.message,'err');
+    st('שגיאה: ' + e.message, 'err');
   }
 }
 
-function snap(ve,reason) {
-  if(!rec||!ve) return;
-  var c=document.createElement('canvas');
-  c.width=1280;c.height=720;
-  c.getContext('2d').drawImage(ve,0,0,1280,720);
-  var ts=Math.floor(secs);
-  shots.push({dataUrl:c.toDataURL('image/jpeg',0.65),timestamp:ts,reason:reason||'manual',timeLabel:Math.floor(ts/60)+':'+String(ts%60).padStart(2,'0')});
-  setInd('iC',true);
-  document.getElementById('iCL').textContent=shots.length+' צילומים';
-  if(reason&&reason!=='fallback'&&reason!=='start'){
-    st('📸 זוהה: "'+reason+'"','ok');
-    setTimeout(function(){st('מקליט...','ok');},2000);
-  }
-}
-
-function startTriggerDetection(audioStream) {
-  var tMR;
-  try{tMR=new MediaRecorder(audioStream,{mimeType:['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'].find(function(t){return MediaRecorder.isTypeSupported(t);})||''});}
-  catch(e){return;}
-  tMR.ondataavailable=function(e){if(e.data.size>0)audioBuffer.push(e.data);};
-  tMR.start(1000);
-  triggerCheckInt=setInterval(async function(){
-    if(!rec||audioBuffer.length===0) return;
-    var blob=new Blob(audioBuffer.slice(-8),{type:'audio/webm'});
-    audioBuffer=audioBuffer.slice(-3);
-    if(blob.size<2000) return;
-    try{
-      var fd=new FormData();
-      fd.append('file',blob,'chunk.webm');
-      var r=await fetch(API_BASE+'/transcribe',{method:'POST',body:fd});
-      if(!r.ok) return;
-      var txt=((await r.json()).text||'').toLowerCase();
-      for(var i=0;i<TRIGGERS.length;i++){
-        if(txt.indexOf(TRIGGERS[i])>=0){
-          var now=Date.now();
-          if(now-lastTriggerTime>3000&&videoEl&&rec){
-            lastTriggerTime=now;
-            snap(videoEl,TRIGGERS[i]);
-          }
-          break;
-        }
-      }
-    }catch(e){}
-  },8000);
+function takeShot(videoEl) {
+  if (!rec) return;
+  const c = document.createElement('canvas');
+  c.width = 1280; c.height = 720;
+  c.getContext('2d').drawImage(videoEl, 0, 0, 1280, 720);
+  shots.push(c.toDataURL('image/jpeg', 0.65));
+  setInd('indC', true);
+  document.getElementById('indCLbl').textContent = shots.length + ' צילומים';
 }
 
 async function stopRec() {
-  clearInterval(timerInt);clearInterval(shotInt);
-  if(triggerCheckInt){clearInterval(triggerCheckInt);triggerCheckInt=null;}
-  audioBuffer=[];rec=false;stopViz();
-  document.getElementById('recBtn').className='rec-btn loading';
-  document.getElementById('recBtn').textContent='⏳  מעבד...';
-  document.getElementById('timer').className='timer';
-  document.getElementById('wave').className='wave';
-  setInd('iA',false);setInd('iS',false);
-  if(mr&&mr.state!=='inactive'){mr.stop();await new Promise(function(r){mr.onstop=r;});}
+  clearInterval(timerInt); clearInterval(shotInt);
+  rec = false;
+  stopVisualizer();
+  document.getElementById('recBtn').className = 'rec-btn loading';
+  document.getElementById('recBtn').textContent = '⏳  מעבד...';
+  document.getElementById('timer').className = 'timer-display';
+  document.getElementById('waveform').className = 'waveform';
+  setInd('indA', false); setInd('indS', false);
 
-  var blob=new Blob(chunks,{type:'audio/webm'});
-  if(blob.size<8000){st('ההקלטה קצרה מדי','err');resetBtn();return;}
+  if (mr && mr.state !== 'inactive') { mr.stop(); await new Promise(r => mr.onstop = r); }
 
-  await processRecording(blob,shots);
+  await processAll(new Blob(chunks, { type: 'audio/webm' }), shots);
 }
 
-async function processRecording(blob,screenshots) {
-  var transcript='',screenText='';
-  setStep(2);showLoading('📝 מתמלל אודיו...','');
-  try{
-    var fd=new FormData();fd.append('file',blob,'rec.webm');
-    var r=await fetch(API_BASE+'/transcribe',{method:'POST',body:fd});
-    if(!r.ok) throw new Error(await r.text());
-    var wd=await r.json();
-    transcript=wd.text||'';segments=wd.segments||[];txText=transcript;
-  }catch(e){hideLoading();st('שגיאה בתמלול: '+e.message,'err');resetBtn();return;}
+async function processAll(blob, screenshots) {
+  const key = document.getElementById('apiKey').value.trim();
+  let transcript = '', screenText = '';
 
-  if(screenshots.length>0){
-    setStep(3);showLoading('👁 מנתח '+screenshots.length+' צילומי מסך...','');
-    try{
-      var imgs=screenshots.slice(-6).map(function(s){return typeof s==='object'?s.dataUrl:s;});
-      var or=await fetch(API_BASE+'/ocr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images:imgs})});
-      if(or.ok) screenText=(await or.json()).text||'';
-    }catch(e){console.warn('OCR:',e);}
+  if (blob.size < 8000) { st('ההקלטה קצרה מדי', 'err'); resetBtn(); return; }
+
+  setStep(2); st('מתמלל עם Whisper...', 'proc');
+  showProcCard('📝 מתמלל אודיו...');
+  try {
+    const fd = new FormData();
+    fd.append('file', blob, 'rec.webm');
+    fd.append('model', 'whisper-1');
+    fd.append('language', 'he');
+    const r = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + key }, body: fd
+    });
+    if (!r.ok) throw new Error((await r.json()).error?.message);
+    transcript = (await r.json()).text;
+    transcriptText = transcript;
+  } catch(e) { st('שגיאה בתמלול: ' + e.message, 'err'); resetBtn(); return; }
+
+  if (screenshots.length > 0) {
+    setStep(3); st('מנתח צילומים...', 'proc');
+    showProcCard('👁 מנתח צילומי מסך...');
+    try {
+      const imgs = screenshots.slice(-6);
+      const vr = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gpt-4o', max_tokens: 2000,
+          messages: [{ role: 'user', content: [
+            { type: 'text', text: 'חלץ את כל מה שמופיע בצילומי המסך: טקסט, נוסחאות בLaTeX, גרפים, טבלאות. כתוב רק מה שרואים.' },
+            ...imgs.map(img => ({ type: 'image_url', image_url: { url: img, detail: 'high' } }))
+          ]}]
+        })
+      });
+      if (vr.ok) screenText = (await vr.json()).choices[0].message.content;
+    } catch(e) { console.warn('OCR:', e); }
   }
 
-  setStep(4);showLoading('🧠 מסכם ומצליב מידע...','');
-  var shotsMeta=screenshots.map(function(s){return{timestamp:s.timestamp||0,reason:s.reason||''};});
-  try{
-    var sr=await fetch(API_BASE+'/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:transcript,screen_text:screenText,segments:segments,shots_meta:shotsMeta})});
-    if(!sr.ok) throw new Error(await sr.text());
-    sumData=await sr.json();
-    hideLoading();setStep(5);
-    renderSummary(sumData,transcript,screenshots.length);
-    st('הסיכום מוכן! 🎉','ok');
+  setStep(4); st('מסכם הכל...', 'proc');
+  showProcCard('🧠 מסכם ומארגן...');
+
+  const ctx = [
+    transcript ? '=== מה המרצה אמר ===\n' + transcript : '',
+    screenText ? '=== מה היה על הלוח/מסך ===\n' + screenText : ''
+  ].filter(Boolean).join('\n\n');
+
+  try {
+    const sr = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o', max_tokens: 3500,
+        messages: [
+          { role: 'system', content: `אתה מומחה לסיכום שיעורים אקדמיים לסטודנטים ישראלים.
+
+כללי ברזל:
+1. סכם רק את מה שמופיע בתמלול ובצילומי המסך
+2. נוסחאות — תמיד בLaTeX: inline ב-$...$ ושורה נפרדת ב-$$...$$
+3. תרגילים — כל שלב בנפרד עם נוסחה מלאה
+4. הצלבה — לכל נוסחה ציין: "screen" אם מהמסך, "voice" אם מהאודיו, "both" אם שניהם
+5. הסבר כל מושג בעברית פשוטה שכל אחד יבין
+
+החזר JSON בלבד (ללא markdown backticks):
+{
+  "title": "נושא השיעור",
+  "topics": ["נושא1", "נושא2"],
+  "sections": [
+    { "type": "explanation", "title": "כותרת", "content": "טקסט" },
+    { "type": "formula", "title": "נוסחאות", "formulas": [{ "name": "שם", "latex": "$$...$$", "meaning": "הסבר", "source": "screen|voice|both" }] },
+    { "type": "exercise", "title": "תרגיל שנפתר", "problem": "שאלה", "steps": [{ "step": 1, "desc": "מה עושים", "formula": "$$...$$ אופציונלי" }], "answer": "תשובה" },
+    { "type": "highlight", "title": "חשוב למבחן", "points": ["נקודה1"] }
+  ],
+  "exercises": [
+    { "question": "שאלת תרגול לפי החומר (עם נוסחאות בLaTeX)", "hint": "רמז קצר" }
+  ]
+}` },
+          { role: 'user', content: 'סכם:\n\n' + ctx }
+        ]
+      })
+    });
+    if (!sr.ok) throw new Error((await sr.json()).error?.message);
+    const raw = (await sr.json()).choices[0].message.content;
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    summaryData = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+    renderSummary(summaryData, transcript, screenshots.length);
+    setStep(5); st('הסיכום מוכן!', 'ok');
     resetBtn();
-  }catch(e){hideLoading();st('שגיאה: '+e.message,'err');resetBtn();}
+  } catch(e) { st('שגיאה: ' + e.message, 'err'); resetBtn(); }
 }
 
-function renderSummary(data,transcript,shotCount) {
-  var html='<div class="card"><div class="sum-header"><div class="sum-title">'+(data.title||'סיכום השיעור')+'</div><div class="sum-meta"><span>⏱ '+Math.floor(secs/60)+' דקות</span><span>📸 '+shotCount+' צילומים</span></div></div><div class="chips">'+((data.topics||[]).map(function(t){return'<span class="chip">'+t+'</span>';}).join(''))+'</div></div>';
+function showProcCard(msg) {
+  document.getElementById('mainContent').innerHTML = `
+    <div class="card">
+      <div style="text-align:center;padding:2rem;color:var(--text3);">
+        <div style="font-size:32px;margin-bottom:1rem;">${msg.split(' ')[0]}</div>
+        <div style="font-size:14px;">${msg}</div>
+      </div>
+    </div>`;
+}
 
-  (data.sections||[]).forEach(function(sec){
-    if(sec.type==='explanation'){
-      html+='<div class="card"><div class="sec-title" style="color:var(--green)">📖 '+sec.title+'</div><div class="sec-body">'+(sec.content||'').replace(/\n/g,'<br>')+'</div></div>';
-    } else if(sec.type==='formula'){
-      var fh=(sec.formulas||[]).map(function(f){
-        var sc=f.source==='screen'?'src-s':f.source==='both'?'src-b':'src-v';
-        var sl=f.source==='screen'?'📺 מסך':f.source==='both'?'📺🎙 שניהם':'🎙 הסבר';
-        return'<div class="formula-card"><div class="formula-hdr"><div class="formula-name">'+f.name+'</div><div class="formula-src '+sc+'">'+sl+'</div></div><div class="formula-latex">'+f.latex+'</div><div class="formula-meaning">💡 '+f.meaning+'</div></div>';
+function renderSummary(data, transcript, shotCount) {
+  let html = `
+    <div class="card">
+      <div class="sum-header">
+        <div class="sum-title">${data.title || 'סיכום השיעור'}</div>
+        <div class="sum-meta">
+          <span>⏱ ${Math.floor(secs/60)} דקות</span>
+          <span>📸 ${shotCount} צילומים</span>
+        </div>
+      </div>
+      <div class="chips">${(data.topics||[]).map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+    </div>`;
+
+  for (const sec of (data.sections||[])) {
+    if (sec.type === 'explanation') {
+      html += `<div class="card sum-section">
+        <div class="sum-sec-title">📖 ${sec.title}</div>
+        <div class="sum-sec-body">${(sec.content||'').replace(/\n/g,'<br>')}</div>
+      </div>`;
+    } else if (sec.type === 'formula') {
+      const fHtml = (sec.formulas||[]).map(f => {
+        const srcCls = f.source==='screen'?'src-screen':f.source==='both'?'src-both':'src-voice';
+        const srcLbl = f.source==='screen'?'📺 מסך':f.source==='both'?'📺🎙 שניהם':'🎙 הסבר';
+        return `<div class="formula-card">
+          <div class="formula-header">
+            <div class="formula-name">${f.name}</div>
+            <div class="formula-source ${srcCls}">${srcLbl}</div>
+          </div>
+          <div class="formula-latex">${f.latex}</div>
+          <div class="formula-meaning">💡 ${f.meaning}</div>
+        </div>`;
       }).join('');
-      html+='<div class="card"><div class="sec-title" style="color:var(--purple)">📐 '+sec.title+'</div>'+fh+'</div>';
-    } else if(sec.type==='exercise'){
-      var sh=(sec.steps||[]).map(function(s,i){return'<div class="ex-step"><div class="ex-n">'+(i+1)+'</div><div><div class="ex-desc">'+s.desc+'</div>'+(s.formula?'<div class="ex-formula">'+s.formula+'</div>':'')+'</div></div>';}).join('');
-      html+='<div class="card"><div class="sec-title" style="color:var(--amber)">✏️ '+sec.title+'</div><div class="ex-problem">❓ '+(sec.problem||'')+'</div><div class="ex-steps">'+sh+'</div>'+(sec.answer?'<div class="ex-answer">✅ '+sec.answer+'</div>':'')+'</div>';
-    } else if(sec.type==='highlight'){
-      html+='<div class="card"><div class="sec-title" style="color:var(--amber)">🎯 '+sec.title+'</div><div class="hl-box">'+((sec.points||[]).map(function(p){return'<div class="hl-pt">⭐ '+p+'</div>';}).join(''))+'</div></div>';
+      html += `<div class="card sum-section">
+        <div class="sum-sec-title">📐 ${sec.title}</div>${fHtml}
+      </div>`;
+    } else if (sec.type === 'exercise') {
+      const stepsHtml = (sec.steps||[]).map((s,i) => `
+        <div class="ex-step">
+          <div class="ex-step-n">${i+1}</div>
+          <div>
+            <div class="ex-step-desc">${s.desc}</div>
+            ${s.formula ? `<div class="ex-step-formula">${s.formula}</div>` : ''}
+          </div>
+        </div>`).join('');
+      html += `<div class="card sum-section">
+        <div class="sum-sec-title">✏️ ${sec.title}</div>
+        <div class="ex-problem">❓ ${sec.problem||''}</div>
+        <div class="ex-steps">${stepsHtml}</div>
+        ${sec.answer ? `<div class="ex-answer">✅ ${sec.answer}</div>` : ''}
+      </div>`;
+    } else if (sec.type === 'highlight') {
+      html += `<div class="card sum-section hl-section">
+        <div class="sum-sec-title">🎯 ${sec.title}</div>
+        ${(sec.points||[]).map(p=>`<div class="hl-point">⭐ ${p}</div>`).join('')}
+      </div>`;
     }
-  });
-
-  if(transcript){
-    html+='<div class="card"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">תמלול מלא</div><div class="transcript">'+transcript+'</div></div>';
   }
 
-  html+='<div class="card"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">יצוא</div><div class="act-row"><button class="act-btn g" onclick="exportPDF(\'summary\')">📄 סיכום PDF</button><button class="act-btn p" onclick="exportPDF(\'exercises\')">📝 דף תרגילים</button></div></div>';
+  if (transcript) {
+    html += `<div class="card">
+      <div class="sec-label">תמלול מלא</div>
+      <div class="transcript-text">${transcript}</div>
+    </div>`;
+  }
 
-  var out=document.getElementById('output');
-  out.innerHTML=html;
-  if(window.MathJax&&MathJax.typesetPromise) MathJax.typesetPromise([out]);
+  html += `<div class="card">
+    <div class="sec-label">יצוא</div>
+    <div class="action-row">
+      <button class="action-btn green" onclick="exportPDF('summary')">📄 סיכום PDF</button>
+      <button class="action-btn purple" onclick="exportPDF('exercises')">📝 דף תרגילים</button>
+      <button class="action-btn amber" onclick="saveShots()">🖼 צילומי מסך</button>
+    </div>
+  </div>`;
+
+  const mainEl = document.getElementById('mainContent');
+  mainEl.innerHTML = html;
+
+  if (window.MathJax?.typesetPromise) {
+    MathJax.typesetPromise([mainEl]).catch(e => console.warn('MathJax:', e));
+  }
 }
 
-function exportPDF(pdfMode) {
-  if(!sumData) return;
-  var w=window.open('','_blank');
-  var now=new Date().toLocaleDateString('he-IL');
-  var title=sumData.title||'סיכום';
-  var topics=(sumData.topics||[]).map(function(t){return'<span style="background:#ede8ff;color:#5a4dcc;font-size:12px;padding:4px 12px;border-radius:20px;margin:3px;display:inline-block">'+t+'</span>';}).join('');
+async function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
 
-  var body='';
-  if(pdfMode==='summary'){
-    (sumData.sections||[]).forEach(function(sec){
-      if(sec.type==='explanation'){
-        body+='<div style="margin-bottom:2rem"><h2 style="color:#007a47;font-size:15px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;border-bottom:2px solid #00d97e;padding-bottom:6px">📖 '+sec.title+'</h2><p style="font-size:14px;color:#333;line-height:1.9">'+(sec.content||'').replace(/\n/g,'<br>')+'</p></div>';
-      } else if(sec.type==='formula'){
-        var fh=(sec.formulas||[]).map(function(f){
-          var sc=f.source==='screen'?'#e6fff4':f.source==='both'?'#fff8e6':'#ede8ff';
-          var st2=f.source==='screen'?'#007a47':f.source==='both'?'#b07a00':'#5a4dcc';
-          var sl=f.source==='screen'?'📺 מסך':f.source==='both'?'📺🎙 שניהם':'🎙 הסבר';
-          return'<div style="background:#f8f7ff;border:1px solid #e0ddff;border-right:4px solid #7c6af7;border-radius:8px;padding:14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:11px;font-weight:700;color:#7c6af7;text-transform:uppercase">'+f.name+'</span><span style="background:'+sc+';color:'+st2+';font-size:10px;padding:2px 8px;border-radius:4px">'+sl+'</span></div><div style="text-align:center;font-size:15px;padding:10px 0;direction:ltr">'+f.latex+'</div><div style="font-size:12px;color:#666;margin-top:8px">💡 '+f.meaning+'</div></div>';
-        }).join('');
-        body+='<div style="margin-bottom:2rem"><h2 style="color:#5a4dcc;font-size:15px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;border-bottom:2px solid #7c6af7;padding-bottom:6px">📐 '+sec.title+'</h2>'+fh+'</div>';
-      } else if(sec.type==='exercise'){
-        var sh=(sec.steps||[]).map(function(s,i){return'<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px"><div style="width:26px;height:26px;min-width:26px;background:#00d97e;color:white;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">'+(i+1)+'</div><div><div style="font-size:13px;color:#333">'+s.desc+'</div>'+(s.formula?'<div style="background:#f5f5f5;border-radius:5px;padding:6px 10px;margin-top:5px;direction:ltr;text-align:center;font-size:14px">'+s.formula+'</div>':'')+'</div></div>';}).join('');
-        body+='<div style="margin-bottom:2rem"><h2 style="color:#b07a00;font-size:15px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;border-bottom:2px solid #ffa726;padding-bottom:6px">✏️ '+sec.title+'</h2><div style="background:#fffbf0;border:1px solid #ffe0a0;border-radius:8px;padding:14px"><div style="font-size:14px;color:#333;margin-bottom:12px">❓ '+(sec.problem||'')+'</div>'+sh+(sec.answer?'<div style="background:#e6fff4;border:1px solid #00d97e;border-radius:6px;padding:12px;font-size:14px;font-weight:600;color:#007a47;margin-top:12px">✅ '+sec.answer+'</div>':'')+'</div></div>';
-      } else if(sec.type==='highlight'){
-        var pts=(sec.points||[]).map(function(p){return'<div style="font-size:14px;color:#333;padding:7px 0;border-bottom:1px solid rgba(255,193,7,0.2)">⭐ '+p+'</div>';}).join('');
-        body+='<div style="margin-bottom:2rem"><h2 style="color:#b07a00;font-size:15px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;border-bottom:2px solid #ffa726;padding-bottom:6px">🎯 '+sec.title+'</h2><div style="background:#fffbf0;border:1px solid #ffc107;border-radius:8px;padding:14px">'+pts+'</div></div>';
-      }
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key.startsWith('sk-')) { st('הכנס API Key תקין', 'err'); return; }
+
+  st('מעבד קובץ: ' + file.name, 'proc');
+  document.getElementById('recBtn').className = 'rec-btn loading';
+  document.getElementById('recBtn').textContent = '⏳  מעבד...';
+
+  setStep(2);
+  showProcCard('📝 מתמלל את הקובץ...');
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file, file.name);
+    fd.append('model', 'whisper-1');
+    fd.append('language', 'he');
+    const r = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + key }, body: fd
     });
-  } else {
-    // Exercises page
-    (sumData.exercises||[]).forEach(function(ex,i){
-      body+='<div style="background:white;border:1.5px solid #e0e0f0;border-right:4px solid #7c6af7;border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;page-break-inside:avoid"><span style="background:#7c6af7;color:white;font-size:12px;padding:3px 10px;border-radius:20px">שאלה '+(i+1)+'</span><p style="font-size:15px;color:#1a1a2e;margin:12px 0">'+ex.question+'</p>'+(ex.hint?'<p style="font-size:12px;color:#888;font-style:italic">💡 רמז: '+ex.hint+'</p>':'')+'<div style="margin-top:16px;border-top:1px dashed #ddd;padding-top:12px"><div style="display:flex;flex-direction:column;gap:18px">'+Array(4).fill('<div style="height:1px;background:#e8e8f0"></div>').join('')+'</div></div></div>';
+    if (!r.ok) throw new Error((await r.json()).error?.message);
+    const transcript = (await r.json()).text;
+    transcriptText = transcript;
+
+    setStep(4);
+    showProcCard('🧠 מסכם...');
+
+    const sr = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o', max_tokens: 3500,
+        messages: [
+          { role: 'system', content: `אתה מומחה לסיכום שיעורים אקדמיים לסטודנטים ישראלים.
+סכם את התמלול הבא. נוסחאות תמיד בLaTeX ($...$ או $$...$$). הסבר כל מושג בעברית פשוטה.
+החזר JSON בלבד:
+{"title":"נושא","topics":["נושא1"],"sections":[{"type":"explanation","title":"כותרת","content":"טקסט"},{"type":"formula","title":"נוסחאות","formulas":[{"name":"שם","latex":"$$...$$","meaning":"הסבר","source":"voice"}]},{"type":"exercise","title":"תרגיל","problem":"שאלה","steps":[{"step":1,"desc":"מה עושים","formula":""}],"answer":"תשובה"},{"type":"highlight","title":"חשוב למבחן","points":["נקודה"]}],"exercises":[{"question":"שאלת תרגול","hint":"רמז"}]}` },
+          { role: 'user', content: 'סכם:
+
+' + transcript }
+        ]
+      })
     });
+    if (!sr.ok) throw new Error((await sr.json()).error?.message);
+    const raw = (await sr.json()).choices[0].message.content;
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    summaryData = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+    secs = Math.round(file.size / 16000); // estimate
+    renderSummary(summaryData, transcript, 0);
+    setStep(5); st('הסיכום מוכן!', 'ok');
+  } catch(e) {
+    st('שגיאה: ' + e.message, 'err');
   }
 
-  var html='<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><script>window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]]}}<\/script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"><\/script><style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:3rem;direction:rtl;color:#1a1a2e;print-color-adjust:exact;-webkit-print-color-adjust:exact}@media print{body{padding:2rem}}</style></head><body><div style="text-align:center;margin-bottom:3rem;padding:2rem;background:linear-gradient(135deg,#0a0a1f,#1a1a3e);color:white;border-radius:12px"><p style="color:#00d97e;font-weight:700;letter-spacing:3px;font-size:13px;margin-bottom:1rem">ACADEMICRESCUE AI</p><h1 style="font-size:28px;font-weight:900;margin-bottom:8px">'+title+(pdfMode==="exercises"?" — דף תרגילים":"")+'</h1><div style="margin:1rem 0">'+topics+'</div><p style="color:rgba(255,255,255,0.4);font-size:12px">'+now+'</p></div>'+body+'<script>window.onload=function(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().then(function(){window.print();});else{setTimeout(function(){window.print();},1000);}}<\/script></body></html>';
+  document.getElementById('recBtn').className = 'rec-btn idle';
+  document.getElementById('recBtn').textContent = '📁  בחר קובץ שיעור';
+  input.value = '';
+}
 
-  w.document.write(html);
-  w.document.close();
+async function exportPDF(mode) {
+  if (!summaryData) return;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('he-IL');
+  const data = {
+    summary: summaryData,
+    transcript: transcriptText,
+    exercises: summaryData.exercises || [],
+    meta: { duration: Math.floor(secs/60), shots: shots.length, date: dateStr },
+    mode
+  };
+  const filename = mode === 'summary'
+    ? (summaryData.title || 'סיכום')
+    : (summaryData.title || 'תרגילים') + ' — דף תרגילים';
+
+  st('מייצר PDF...', 'proc');
+  try {
+    const saved = await window.electronAPI.exportPdf({ data, filename });
+    if (saved) st('PDF נשמר ונפתח!', 'ok');
+    else st('בוטל', '');
+  } catch(e) {
+    st('שגיאה: ' + e.message, 'err');
+  }
+}
+
+async function saveShots() {
+  if (!shots.length) { st('אין צילומים', 'err'); return; }
+  await window.electronAPI.saveScreenshots(shots);
+  st('נפתחה תיקיית צילומים', 'ok');
 }
 
 // Visualizer
-function startViz(stream){
-  try{actx=new AudioContext();anlz=actx.createAnalyser();anlz.fftSize=256;actx.createMediaStreamSource(stream).connect(anlz);animW();}catch(e){}
-}
-function animW(){
-  if(!anlz) return;
-  var d=new Uint8Array(anlz.frequencyBinCount);anlz.getByteFrequencyData(d);
-  for(var i=0;i<12;i++){var b=document.getElementById('w'+i);if(!b)continue;var v=d[Math.floor(i*d.length/12)];b.style.height=Math.max(2,Math.min(28,(v/255)*28))+'px';b.style.opacity=Math.max(0.2,v/255);}
-  af=requestAnimationFrame(animW);
-}
-function stopViz(){
-  if(af){cancelAnimationFrame(af);af=null;}
-  if(actx){actx.close();actx=null;anlz=null;}
-  for(var i=0;i<12;i++){var b=document.getElementById('w'+i);if(b){b.style.height='2px';b.style.opacity='0.2';}}
+function startVisualizer(stream) {
+  try {
+    audioCtx = new AudioContext();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+    animateWaves();
+  } catch(e) {}
 }
 
-// Utils
-function setInd(id,on){document.getElementById(id).className='ind'+(on?' on':'');}
-function setStep(n){for(var i=1;i<=5;i++){var e=document.getElementById('s'+i);e.className='prog'+(i<n?' done':i===n?' active':'');}}
-function st(msg,type){var e=document.getElementById('status');e.textContent=msg;e.className='status'+(type?' '+type:'');}
-function resetBtn(){var b=document.getElementById('recBtn');b.className='rec-btn idle';b.textContent='🎬  התחל שיעור';}
-function showLoading(text,sub){var o=document.getElementById('loadingOverlay');document.getElementById('loadingText').textContent=text;document.getElementById('loadingSub').textContent=sub;o.className='loading-overlay show';}
-function hideLoading(){document.getElementById('loadingOverlay').className='loading-overlay';}
+function animateWaves() {
+  if (!analyser) return;
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(data);
+  for (let i = 0; i < 12; i++) {
+    const bar = document.getElementById('wb' + i);
+    if (!bar) continue;
+    const val = data[Math.floor(i * data.length / 12)];
+    bar.style.height = Math.max(2, Math.min(28, (val/255)*28)) + 'px';
+    bar.style.opacity = Math.max(0.2, val/255);
+  }
+  animFrame = requestAnimationFrame(animateWaves);
+}
+
+function stopVisualizer() {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; analyser = null; }
+  for (let i = 0; i < 12; i++) {
+    const b = document.getElementById('wb' + i);
+    if (b) { b.style.height = '2px'; b.style.opacity = '0.2'; }
+  }
+}
+
+function getSupportedMime() {
+  const types = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'];
+  return types.find(t => MediaRecorder.isTypeSupported(t)) || '';
+}
+
+function setInd(id, on) { document.getElementById(id).className = 'ind' + (on ? ' on' : ''); }
+function setStep(n) {
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('s'+i).className = 'prog' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+}
+function st(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-text' + (type ? ' '+type : '');
+}
+function resetBtn() {
+  document.getElementById('recBtn').className = 'rec-btn idle';
+  document.getElementById('recBtn').textContent = '🎬  התחל שיעור';
+}
 </script>
-<div id="installBanner" style="display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:#111118;border:1px solid rgba(0,217,126,0.3);border-radius:12px;padding:12px 20px;z-index:9999;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-  <span style="font-size:24px">🎓</span>
-  <div>
-    <div style="font-size:13px;font-weight:700;color:#f0f0f5;">התקן כאפליקציה</div>
-    <div style="font-size:11px;color:#55556a;">גישה מהירה מהמסך הראשי</div>
-  </div>
-  <button onclick="installApp()" style="background:#00d97e;color:#001a0e;border:none;border-radius:8px;padding:8px 16px;font-family:Heebo,sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-right:8px;">התקן</button>
-  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:none;border:none;color:#55556a;cursor:pointer;font-size:18px;">×</button>
-</div>
-
-<script>
-// Register service worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/static/sw.js').then(function(reg) {
-      console.log('SW registered');
-    }).catch(function(e) {
-      console.warn('SW failed:', e);
-    });
-  });
-}
-
-// PWA install prompt
-var deferredPrompt;
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('installBanner').style.display = 'flex';
-});
-
-function installApp() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(function(result) {
-    deferredPrompt = null;
-    document.getElementById('installBanner').style.display = 'none';
-  });
-}
-
-window.addEventListener('appinstalled', function() {
-  document.getElementById('installBanner').style.display = 'none';
-});
-</script>
+<input type="file" id="fileInput" accept="audio/*,video/*,.mp4,.mp3,.wav,.m4a,.webm" style="display:none" onchange="handleFileUpload(this)">
 </body>
 </html>
