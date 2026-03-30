@@ -2,178 +2,253 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0a0a0f">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AcademicRescue AI</title>
-<link rel="manifest" href="/static/manifest.json">
-<link rel="apple-touch-icon" href="/static/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
-<script>window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},startup:{typeset:false}};</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--green:#00d97e;--green-dim:rgba(0,217,126,0.1);--green-glow:rgba(0,217,126,0.2);--red:#ff4757;--purple:#7c6af7;--purple-dim:rgba(124,106,247,0.1);--amber:#ffa726;--amber-dim:rgba(255,167,38,0.08);--text:#f0f0f5;--text2:#9090aa;--text3:#55556a;}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-app-region:no-drag;}
-body{font-family:"Heebo",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(0,217,126,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,126,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
-.nav-logo{font-size:18px;font-weight:900;}.nav-logo span{color:var(--green);}
-.nav-tagline{font-size:11px;color:var(--text3);}
-.app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:1.5rem 1rem;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Heebo,sans-serif;background:#0a0a0f;color:#f0f0f5;min-height:100vh;}
+nav{background:#111118;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:18px;font-weight:900;}.logo span{color:#00d97e;}
+.app{max-width:800px;margin:0 auto;padding:1.5rem 1rem;}
+.card{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:1.5rem;margin-bottom:1rem;}
+.label{font-size:11px;font-weight:700;color:#55556a;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
 @media(min-width:600px){.modes{grid-template-columns:repeat(4,1fr);}}
-.mode-btn{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:14px 10px;cursor:pointer;transition:all 0.2s;text-align:center;user-select:none;}
-.mode-btn:hover{border-color:var(--border2);}.mode-btn.sel{border-color:var(--green);background:var(--green-dim);}
-.mode-icon{font-size:24px;margin-bottom:6px;}.mode-title{font-size:12px;font-weight:700;color:var(--text);}.mode-desc{font-size:10px;color:var(--text3);margin-top:2px;}
-.info-banner{background:rgba(0,217,126,0.07);border:1px solid rgba(0,217,126,0.2);border-radius:10px;padding:12px 14px;margin-bottom:1rem;font-size:12px;color:var(--text2);line-height:1.6;display:none;}
-.info-banner.show{display:block;}.info-banner strong{color:var(--green);}
-.upload-zone{border:2px dashed var(--border2);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:1rem;display:none;}
-.upload-zone.show{display:block;}.upload-zone:hover,.upload-zone.drag{border-color:var(--green);background:var(--green-dim);}
-.upload-icon{font-size:36px;margin-bottom:10px;}.upload-text{font-size:14px;color:var(--text2);}.upload-sub{font-size:11px;color:var(--text3);margin-top:4px;}
-.rec-btn{width:100%;padding:16px;border:none;border-radius:10px;font-family:"Heebo",sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
-.rec-btn.idle{background:var(--green);color:#001a0e;box-shadow:0 4px 24px var(--green-glow);}
-.rec-btn.idle:hover{transform:translateY(-1px);}
-.rec-btn.rec{background:var(--red);color:white;animation:recPulse 2s infinite;}
-.rec-btn.loading{background:var(--bg3);color:var(--text3);cursor:not-allowed;border:1px solid var(--border);}
-@keyframes recPulse{0%,100%{box-shadow:0 4px 20px rgba(255,71,87,0.3)}50%{box-shadow:0 4px 40px rgba(255,71,87,0.6)}}
-.status{text-align:center;font-size:12px;color:var(--text3);min-height:18px;margin-bottom:0.5rem;}
-.status.ok{color:var(--green);}.status.err{color:var(--red);}.status.proc{color:var(--purple);}
-.inds{display:flex;gap:6px;margin-bottom:1rem;}
-.ind{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center;transition:all 0.3s;}
-.ind.on{background:var(--green-dim);border-color:rgba(0,217,126,0.25);}
-.ind-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);margin:0 auto 5px;}
-.ind.on .ind-dot{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.2s infinite;}
-.ind-lbl{font-size:10px;color:var(--text3);}.ind.on .ind-lbl{color:var(--green);}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
-.wave{display:none;justify-content:center;align-items:center;gap:3px;height:40px;margin:0.5rem 0;}
-.wave.show{display:flex;}.wbar{width:4px;background:var(--green);border-radius:2px;height:3px;}
-.timer{font-family:monospace;font-size:48px;font-weight:600;color:var(--red);text-align:center;letter-spacing:4px;display:none;margin:0.5rem 0;}
-.timer.show{display:block;}
-.progress{display:flex;gap:4px;margin-bottom:1rem;direction:ltr;}
-.prog{flex:1;padding:8px 4px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;text-align:center;font-size:10px;color:var(--text3);transition:all 0.3s;}
-.prog.done{background:var(--green-dim);color:var(--green);}.prog.active{background:var(--purple-dim);color:var(--purple);font-weight:600;}
-.sum-header{background:linear-gradient(135deg,rgba(0,217,126,0.07),rgba(124,106,247,0.07));border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1rem;}
-.sum-title{font-size:22px;font-weight:900;margin-bottom:6px;}
-.sum-meta{font-size:11px;color:var(--text3);display:flex;gap:16px;flex-direction:row-reverse;flex-wrap:wrap;}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0.75rem 0;}
-.chip{background:var(--purple-dim);border:1px solid rgba(124,106,247,0.2);color:var(--purple);font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;}
-.sec-body{font-size:14px;color:var(--text2);line-height:1.9;}
-.formula-card{background:rgba(124,106,247,0.07);border:1px solid rgba(124,106,247,0.18);border-radius:10px;padding:14px;margin-bottom:10px;}
-.formula-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.formula-name{font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;}
-.formula-src{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.06);}
-.src-s{color:var(--green);}.src-b{color:var(--amber);}.src-v{color:var(--purple);}
-.formula-latex{font-size:15px;color:var(--text);text-align:center;padding:10px 0;direction:ltr;}
-.formula-meaning{font-size:12px;color:var(--text3);margin-top:6px;}
-.ex-problem{background:var(--bg3);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--text2);margin-bottom:14px;}
-.ex-steps{display:flex;flex-direction:column;gap:10px;}
-.ex-step{display:flex;gap:12px;align-items:flex-start;}
-.ex-n{width:26px;height:26px;min-width:26px;background:var(--green-dim);border:1px solid rgba(0,217,126,0.3);border-radius:50%;font-size:12px;font-weight:700;color:var(--green);display:flex;align-items:center;justify-content:center;}
-.ex-desc{font-size:13px;color:var(--text2);line-height:1.6;}
-.ex-formula{font-size:14px;color:var(--text);background:var(--bg3);border-radius:6px;padding:6px 12px;direction:ltr;text-align:center;margin-top:6px;}
-.ex-answer{background:var(--green-dim);border:1px solid rgba(0,217,126,0.3);border-radius:8px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--green);margin-top:12px;}
-.hl-box{background:var(--amber-dim);border:1px solid rgba(255,167,38,0.15);border-radius:10px;padding:14px;}
-.hl-pt{font-size:14px;color:var(--text2);padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
-.hl-pt:last-child{border-bottom:none;}
-.transcript{font-size:13px;color:var(--text2);line-height:1.8;max-height:140px;overflow-y:auto;}
-.act-row{display:flex;gap:8px;flex-wrap:wrap;}
-.act-btn{padding:11px 16px;border-radius:8px;border:1.5px solid;background:transparent;font-family:"Heebo",sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
-.act-btn.g{border-color:var(--green);color:var(--green);}.act-btn.g:hover{background:var(--green-dim);}
-.act-btn.p{border-color:var(--purple);color:var(--purple);}.act-btn.p:hover{background:var(--purple-dim);}
-.empty{padding:4rem 2rem;text-align:center;color:var(--text3);}
-.empty-icon{font-size:56px;opacity:0.25;margin-bottom:1rem;}
-.empty-title{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--text2);}
-.empty-sub{font-size:13px;line-height:1.6;}
-.loading-overlay{position:fixed;inset:0;background:rgba(10,10,15,0.85);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:999;pointer-events:none;}.loading-overlay.show{pointer-events:all;}
-.loading-overlay.show{display:flex;}
-.loading-spinner{width:48px;height:48px;border:3px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:1rem;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:16px;color:var(--text2);}.loading-sub{font-size:12px;color:var(--text3);margin-top:6px;}
-::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.mode{background:#1a1a24;border:2px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;text-align:center;cursor:pointer;}
+.mode:hover{border-color:#00d97e;background:rgba(0,217,126,0.1);}
+.mode.active{border-color:#00d97e;background:rgba(0,217,126,0.1);}
+.mode-icon{font-size:24px;margin-bottom:6px;}
+.mode-title{font-size:12px;font-weight:700;}
+.mode-desc{font-size:10px;color:#55556a;margin-top:2px;}
+.upload{border:2px dashed rgba(255,255,255,0.13);border-radius:12px;padding:3rem;text-align:center;cursor:pointer;display:none;}
+.upload.show{display:block;}
+.upload:hover{border-color:#00d97e;background:rgba(0,217,126,0.05);}
+.btn{width:100%;padding:14px;background:#00d97e;color:#001a0e;border:none;border-radius:10px;font-family:Heebo,sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:none;margin-bottom:8px;}
+.btn.show{display:block;}
+.btn.rec{background:#ff4757;color:white;}
+.btn.loading{background:#1a1a24;color:#55556a;cursor:not-allowed;}
+.status{text-align:center;font-size:12px;color:#55556a;min-height:18px;}
+.status.ok{color:#00d97e;}.status.err{color:#ff4757;}.status.proc{color:#7c6af7;}
+.empty{padding:4rem;text-align:center;color:#55556a;}
+.empty-icon{font-size:56px;opacity:0.2;margin-bottom:1rem;}
+.result{font-size:14px;color:#9090aa;line-height:1.9;}
+.chip{display:inline-block;background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.2);color:#7c6af7;font-size:11px;padding:3px 10px;border-radius:20px;margin:2px;}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.formula-box{background:rgba(124,106,247,0.07);border:1px solid rgba(124,106,247,0.18);border-radius:8px;padding:12px;margin-bottom:8px;}
+.formula-latex{text-align:center;padding:8px 0;direction:ltr;font-size:15px;}
+.ex-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.ex-num{width:24px;height:24px;min-width:24px;background:rgba(0,217,126,0.1);border-radius:50%;font-size:11px;font-weight:700;color:#00d97e;display:flex;align-items:center;justify-content:center;}
+.act-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;}
+.act-btn{padding:10px 14px;border-radius:8px;border:1.5px solid;background:transparent;font-family:Heebo,sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.act-g{border-color:#00d97e;color:#00d97e;}.act-p{border-color:#7c6af7;color:#7c6af7;}
 </style>
 </head>
 <body>
 <nav>
-  <div class="nav-logo">Academic<span>Rescue</span></div>
-  <div class="nav-tagline">סיכום שיעורים חכם עם AI</div>
+  <div class="logo">Academic<span>Rescue</span></div>
+  <div style="font-size:11px;color:#55556a;">סיכום שיעורים חכם</div>
 </nav>
 <div class="app">
   <div class="card">
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">מה אתה רוצה לסכם?</div>
+    <div class="label">מה אתה רוצה לסכם?</div>
     <div class="modes">
-      <div class="mode-btn" id="mb-file" onclick="setMode('file')"><div class="mode-icon">📁</div><div class="mode-title">העלאת קובץ</div><div class="mode-desc">MP4, MP3, WAV</div></div>
-      <div class="mode-btn" id="mb-recording" onclick="setMode('recording')"><div class="mode-icon">🎬</div><div class="mode-title">הקלטה שמורה</div><div class="mode-desc">מסך + סאונד</div></div>
-      <div class="mode-btn" id="mb-live" onclick="setMode('live')"><div class="mode-icon">📡</div><div class="mode-title">שיעור חי</div><div class="mode-desc">זום פתוח</div></div>
-      <div class="mode-btn" id="mb-class" onclick="setMode('class')"><div class="mode-icon">🏫</div><div class="mode-title">כיתה פיזית</div><div class="mode-desc">מיקרופון</div></div>
+      <div class="mode" id="m-file"><div class="mode-icon">📁</div><div class="mode-title">העלאת קובץ</div><div class="mode-desc">MP4, MP3, WAV</div></div>
+      <div class="mode" id="m-rec"><div class="mode-icon">🎬</div><div class="mode-title">הקלטה שמורה</div><div class="mode-desc">מסך + סאונד</div></div>
+      <div class="mode" id="m-live"><div class="mode-icon">📡</div><div class="mode-title">שיעור חי</div><div class="mode-desc">זום פתוח</div></div>
+      <div class="mode" id="m-class"><div class="mode-icon">🏫</div><div class="mode-title">כיתה פיזית</div><div class="mode-desc">מיקרופון</div></div>
     </div>
-    <div class="info-banner" id="infoBanner"><strong>🧠 זיהוי חכם:</strong> מצלם מסך אוטומטית כשמזהה "תרגיל", "דוגמה" ועוד. כל נוסחה מוצלבת עם הצילום מאותה שנייה.</div>
-    <div class="upload-zone" id="uploadZone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDrop(event)" onclick="document.getElementById('fileInput').click()">
-      <div class="upload-icon">📎</div>
-      <div class="upload-text">גרור קובץ לכאן או לחץ לבחירה</div>
-      <div class="upload-sub">MP4 · MP3 · WAV · M4A · WEBM</div>
+    <div class="upload" id="uploadZone">
+      <div style="font-size:36px;margin-bottom:10px;">📎</div>
+      <div style="font-size:14px;color:#9090aa;">גרור קובץ לכאן או לחץ לבחירה</div>
+      <div style="font-size:11px;color:#55556a;margin-top:4px;">MP4 · MP3 · WAV · M4A</div>
     </div>
-    <input type="file" id="fileInput" accept="audio/*,video/*" style="display:none" onchange="onFileSelected(this)">
-    <div class="inds" id="inds" style="display:none">
-      <div class="ind" id="iA"><div class="ind-dot"></div><div class="ind-lbl" id="iAL">סאונד</div></div>
-      <div class="ind" id="iS"><div class="ind-dot"></div><div class="ind-lbl">מסך</div></div>
-      <div class="ind" id="iC"><div class="ind-dot"></div><div class="ind-lbl" id="iCL">0 צילומים</div></div>
-    </div>
-    <div class="wave" id="wave"><div class="wbar" id="w0"></div><div class="wbar" id="w1"></div><div class="wbar" id="w2"></div><div class="wbar" id="w3"></div><div class="wbar" id="w4"></div><div class="wbar" id="w5"></div><div class="wbar" id="w6"></div><div class="wbar" id="w7"></div><div class="wbar" id="w8"></div><div class="wbar" id="w9"></div><div class="wbar" id="w10"></div><div class="wbar" id="w11"></div></div>
-    <div class="timer" id="timer">00:00</div>
-    <div class="progress" id="progress" style="display:none">
-      <div class="prog" id="s1">🎬 הקלטה</div><div class="prog" id="s2">📝 תמלול</div><div class="prog" id="s3">👁 מסך</div><div class="prog" id="s4">🧠 סיכום</div><div class="prog" id="s5">✅ מוכן</div>
-    </div>
-    <button class="rec-btn idle" id="recBtn" onclick="toggleRec()" style="display:none">🎬  התחל שיעור</button>
+    <input type="file" id="fileIn" accept="audio/*,video/*" style="display:none">
+    <button class="btn" id="recBtn">🎬 התחל שיעור</button>
     <div class="status" id="status">בחר מצב כדי להתחיל</div>
   </div>
-  <div id="output">
-    <div class="empty"><div class="empty-icon">🎓</div><div class="empty-title">מוכן לסכם</div><div class="empty-sub">בחר מצב למעלה והתחל.<br>הסיכום יופיע כאן תוך דקות.</div></div>
+  <div id="out">
+    <div class="empty">
+      <div class="empty-icon">🎓</div>
+      <div style="font-size:18px;font-weight:700;color:#9090aa;margin-bottom:6px;">מוכן לסכם</div>
+      <div style="font-size:13px;">בחר מצב למעלה והתחל</div>
+    </div>
   </div>
 </div>
-<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div><div class="loading-text" id="loadingText">מעבד...</div><div class="loading-sub" id="loadingSub"></div></div>
-<div id="ib" style="display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);width:calc(100% - 2rem);max-width:420px;background:#111118;border:1px solid rgba(0,217,126,0.3);border-radius:14px;padding:16px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
-  <div style="display:flex;justify-content:space-between;margin-bottom:12px;"><div style="font-size:14px;font-weight:700;color:#f0f0f5;">🎓 התקן כאפליקציה</div><button onclick="document.getElementById('ib').style.display='none'" style="background:none;border:none;color:#55556a;cursor:pointer;font-size:20px;">×</button></div>
-  <div id="ib-chrome" style="display:none"><button onclick="doInstall()" style="width:100%;background:#00d97e;color:#001a0e;border:none;border-radius:8px;padding:12px;font-family:Heebo,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">התקן עכשיו</button></div>
-  <div id="ib-ios" style="display:none;background:#1a1a24;border-radius:10px;padding:14px;font-size:13px;color:#9090aa;line-height:2;">
-    <div style="color:#00d97e;font-weight:700;margin-bottom:4px;">3 צעדים להתקנה:</div>
-    <div>① לחץ <strong style="color:white">□↑</strong> בתחתית Safari</div>
-    <div>② בחר <strong style="color:white">"הוסף למסך הבית"</strong></div>
-    <div>③ לחץ <strong style="color:#00d97e">"הוסף"</strong> — זהו!</div>
-  </div>
-</div>
-<script type="text/javascript">
-var API_BASE=window.location.origin;
-var mode=null,rec=false,mr=null,chunks=[],shots=[],shotInt=null,timerInt=null,secs=0,videoEl=null,actx=null,anlz=null,af=null,audioBuffer=[],triggerCheckInt=null,segments=[],sumData=null,txText="",lastTriggerTime=0;
-var TRIGGERS=["תרגיל","דוגמה","דוגמא","נסתכל","הנה","ניפתור","שאלה","נחשב","נכתוב","נרשום","לדוגמה","למשל","נראה","פתרון","חישוב","נציב","נגזור","נבדוק"];
-function setMode(m){mode=m;document.querySelectorAll(".mode-btn").forEach(function(el){el.classList.remove("sel");});document.getElementById("mb-"+m).classList.add("sel");var uz=document.getElementById("uploadZone");var rb=document.getElementById("recBtn");var ib2=document.getElementById("infoBanner");var inds=document.getElementById("inds");var prog=document.getElementById("progress");uz.className="upload-zone";rb.style.display="none";ib2.className="info-banner";inds.style.display="none";prog.style.display="none";if(m==="file"){uz.className="upload-zone show";st("בחר קובץ MP4, MP3 או WAV","ok");}else{rb.style.display="block";inds.style.display="flex";prog.style.display="flex";if(m!=="class")ib2.className="info-banner show";st("לחץ התחל שיעור כשאתה מוכן","ok");}}
-function onDrop(e){e.preventDefault();document.getElementById("uploadZone").classList.remove("drag");var file=e.dataTransfer.files[0];if(file)processFile(file);}
-function onFileSelected(input){var file=input.files[0];if(file)processFile(file);input.value="";}
-async function processFile(file){showLoading("📝 מתמלל קובץ...",file.name);setStep(2);try{var fd=new FormData();fd.append("file",file,file.name);var r=await fetch(API_BASE+"/transcribe",{method:"POST",body:fd});if(!r.ok)throw new Error(await r.text());var data=await r.json();txText=data.text||"";segments=data.segments||[];showLoading("🧠 מסכם...","");setStep(4);var sumR=await fetch(API_BASE+"/summarize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({transcript:txText,screen_text:"",segments:segments,shots_meta:[]})});if(!sumR.ok)throw new Error(await sumR.text());sumData=await sumR.json();secs=Math.round(file.size/16000);hideLoading();setStep(5);renderSummary(sumData,txText,0);st("הסיכום מוכן! 🎉","ok");}catch(e){hideLoading();st("שגיאה: "+e.message,"err");}}
-async function toggleRec(){if(rec)await stopRec();else await startRec();}
-async function startRec(){try{var audioStream;if(mode==="class"){audioStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});document.getElementById("iAL").textContent="מיקרופון";}else{var stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:1,width:1280,height:720},audio:{echoCancellation:false,noiseSuppression:false}});var aTracks=stream.getAudioTracks();var vTracks=stream.getVideoTracks();if(!aTracks.length){stream.getTracks().forEach(function(t){t.stop();});st("לא נמצא סאונד — סמן Share audio","err");return;}audioStream=new MediaStream(aTracks);document.getElementById("iAL").textContent=mode==="live"?"סאונד זום":"סאונד";if(vTracks.length){videoEl=document.createElement("video");videoEl.srcObject=new MediaStream(vTracks);videoEl.play();videoEl.onloadedmetadata=function(){shots=[];shotInt=setInterval(function(){snap(videoEl,"fallback");},60000);setTimeout(function(){snap(videoEl,"start");},2000);setInd("iS",true);};vTracks[0].onended=function(){if(rec)stopRec();};startTriggerDetection(audioStream);}}var mime=["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg"].find(function(t){return MediaRecorder.isTypeSupported(t);})||"";mr=new MediaRecorder(audioStream,mime?{mimeType:mime}:{});chunks=[];mr.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};mr.start(1000);setInd("iA",true);startViz(audioStream);rec=true;secs=0;setStep(1);document.getElementById("recBtn").className="rec-btn rec";document.getElementById("recBtn").textContent="⏹  עצור שיעור";document.getElementById("timer").className="timer show";document.getElementById("wave").className="wave show";st("מקליט... לחץ עצור שיעור בסיום","ok");timerInt=setInterval(function(){secs++;var m=String(Math.floor(secs/60)).padStart(2,"0"),s=String(secs%60).padStart(2,"0");document.getElementById("timer").textContent=m+":"+s;},1000);}catch(e){st(e.name==="NotAllowedError"?"ביטלת — נסה שוב":"שגיאה: "+e.message,"err");}}
-function snap(ve,reason){if(!rec||!ve)return;var c=document.createElement("canvas");c.width=1280;c.height=720;c.getContext("2d").drawImage(ve,0,0,1280,720);var ts=Math.floor(secs);shots.push({dataUrl:c.toDataURL("image/jpeg",0.65),timestamp:ts,reason:reason||"manual",timeLabel:Math.floor(ts/60)+":"+String(ts%60).padStart(2,"0")});setInd("iC",true);document.getElementById("iCL").textContent=shots.length+" צילומים";if(reason&&reason!=="fallback"&&reason!=="start"){st("📸 זוהה: "+reason,"ok");setTimeout(function(){st("מקליט...","ok");},2000);}}
-function startTriggerDetection(audioStream){var tMR;try{tMR=new MediaRecorder(audioStream,{mimeType:["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg"].find(function(t){return MediaRecorder.isTypeSupported(t);})||""});}catch(e){return;}tMR.ondataavailable=function(e){if(e.data.size>0)audioBuffer.push(e.data);};tMR.start(1000);triggerCheckInt=setInterval(async function(){if(!rec||audioBuffer.length===0)return;var blob=new Blob(audioBuffer.slice(-8),{type:"audio/webm"});audioBuffer=audioBuffer.slice(-3);if(blob.size<2000)return;try{var fd=new FormData();fd.append("file",blob,"chunk.webm");var r=await fetch(API_BASE+"/transcribe",{method:"POST",body:fd});if(!r.ok)return;var txt=((await r.json()).text||"").toLowerCase();for(var i=0;i<TRIGGERS.length;i++){if(txt.indexOf(TRIGGERS[i])>=0){var now=Date.now();if(now-lastTriggerTime>3000&&videoEl&&rec){lastTriggerTime=now;snap(videoEl,TRIGGERS[i]);}break;}}}catch(e){}},8000);}
-async function stopRec(){clearInterval(timerInt);clearInterval(shotInt);if(triggerCheckInt){clearInterval(triggerCheckInt);triggerCheckInt=null;}audioBuffer=[];rec=false;stopViz();document.getElementById("recBtn").className="rec-btn loading";document.getElementById("recBtn").textContent="⏳  מעבד...";document.getElementById("timer").className="timer";document.getElementById("wave").className="wave";setInd("iA",false);setInd("iS",false);if(mr&&mr.state!=="inactive"){mr.stop();await new Promise(function(r){mr.onstop=r;});}var blob=new Blob(chunks,{type:"audio/webm"});if(blob.size<8000){st("ההקלטה קצרה מדי","err");resetBtn();return;}await processRecording(blob,shots);}
-async function processRecording(blob,screenshots){var transcript="",screenText="";setStep(2);showLoading("📝 מתמלל אודיו...","");try{var fd=new FormData();fd.append("file",blob,"rec.webm");var r=await fetch(API_BASE+"/transcribe",{method:"POST",body:fd});if(!r.ok)throw new Error(await r.text());var wd=await r.json();transcript=wd.text||"";segments=wd.segments||[];txText=transcript;}catch(e){hideLoading();st("שגיאה בתמלול: "+e.message,"err");resetBtn();return;}if(screenshots.length>0){setStep(3);showLoading("👁 מנתח "+screenshots.length+" צילומי מסך...","");try{var imgs=screenshots.slice(-6).map(function(s){return typeof s==="object"?s.dataUrl:s;});var or=await fetch(API_BASE+"/ocr",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({images:imgs})});if(or.ok)screenText=(await or.json()).text||"";}catch(e){console.warn("OCR:",e);}}setStep(4);showLoading("🧠 מסכם ומצליב מידע...","");var shotsMeta=screenshots.map(function(s){return{timestamp:s.timestamp||0,reason:s.reason||""};});try{var sr=await fetch(API_BASE+"/summarize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({transcript:transcript,screen_text:screenText,segments:segments,shots_meta:shotsMeta})});if(!sr.ok)throw new Error(await sr.text());sumData=await sr.json();hideLoading();setStep(5);renderSummary(sumData,transcript,screenshots.length);st("הסיכום מוכן! 🎉","ok");resetBtn();}catch(e){hideLoading();st("שגיאה: "+e.message,"err");resetBtn();}}
-function renderSummary(data,transcript,shotCount){var html="<div class=card><div class=sum-header><div class=sum-title>"+(data.title||"סיכום השיעור")+"</div><div class=sum-meta><span>⏱ "+Math.floor(secs/60)+" דקות</span><span>📸 "+shotCount+" צילומים</span></div></div><div class=chips>"+((data.topics||[]).map(function(t){return"<span class=chip>"+t+"</span>";}).join(""))+"</div></div>";(data.sections||[]).forEach(function(sec){if(sec.type==="explanation"){html+="<div class=card><div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📖 "+sec.title+"</div><div class=sec-body>"+(sec.content||"").replace(/
-/g,"<br>")+"</div></div>";}else if(sec.type==="formula"){var fh=(sec.formulas||[]).map(function(f){var sc=f.source==="screen"?"src-s":f.source==="both"?"src-b":"src-v";var sl=f.source==="screen"?"📺 מסך":f.source==="both"?"📺🎙 שניהם":"🎙 הסבר";return"<div class=formula-card><div class=formula-hdr><div class=formula-name>"+f.name+"</div><div class="formula-src "+sc+"">"+sl+"</div></div><div class=formula-latex>"+f.latex+"</div><div class=formula-meaning>💡 "+f.meaning+"</div></div>";}).join("");html+="<div class=card><div style="font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">📐 "+sec.title+"</div>"+fh+"</div>";}else if(sec.type==="exercise"){var sh=(sec.steps||[]).map(function(s,i){return"<div class=ex-step><div class=ex-n>"+(i+1)+"</div><div><div class=ex-desc>"+s.desc+"</div>"+(s.formula?"<div class=ex-formula>"+s.formula+"</div>":"")+"</div></div>";}).join("");html+="<div class=card><div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">✏️ "+sec.title+"</div><div class=ex-problem>❓ "+(sec.problem||"")+"</div><div class=ex-steps>"+sh+"</div>"+(sec.answer?"<div class=ex-answer>✅ "+sec.answer+"</div>":"")+"</div>";}else if(sec.type==="highlight"){html+="<div class=card><div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">🎯 "+sec.title+"</div><div class=hl-box>"+((sec.points||[]).map(function(p){return"<div class=hl-pt>⭐ "+p+"</div>";}).join(""))+"</div></div>";}});if(transcript)html+="<div class=card><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">תמלול מלא</div><div class=transcript>"+transcript+"</div></div>";html+="<div class=card><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">יצוא</div><div class=act-row><button class="act-btn g" onclick="exportPDF('summary')">📄 סיכום PDF</button><button class="act-btn p" onclick="exportPDF('exercises')">📝 דף תרגילים</button></div></div>";var out=document.getElementById("output");out.innerHTML=html;if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([out]);}
-function exportPDF(pdfMode){if(!sumData)return;var w=window.open("","_blank");var title=sumData.title||"סיכום";var topics=(sumData.topics||[]).map(function(t){return"<span style="background:#ede8ff;color:#5a4dcc;font-size:12px;padding:4px 12px;border-radius:20px;margin:3px;display:inline-block">"+t+"</span>";}).join("");var body="";if(pdfMode==="summary"){(sumData.sections||[]).forEach(function(sec){if(sec.type==="explanation"){body+="<div style="margin-bottom:2rem"><h2 style="color:#007a47;font-size:15px;border-bottom:2px solid #00d97e;padding-bottom:6px;margin-bottom:10px">📖 "+sec.title+"</h2><p style="font-size:14px;color:#333;line-height:1.9">"+(sec.content||"").replace(/
-/g,"<br>")+"</p></div>";}else if(sec.type==="formula"){var fh=(sec.formulas||[]).map(function(f){return"<div style="background:#f8f7ff;border:1px solid #e0ddff;border-right:4px solid #7c6af7;border-radius:8px;padding:14px;margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#7c6af7;text-transform:uppercase;margin-bottom:8px">"+f.name+"</div><div style="text-align:center;font-size:15px;padding:10px 0;direction:ltr">"+f.latex+"</div><div style="font-size:12px;color:#666;margin-top:8px">💡 "+f.meaning+"</div></div>";}).join("");body+="<div style="margin-bottom:2rem"><h2 style="color:#5a4dcc;font-size:15px;border-bottom:2px solid #7c6af7;padding-bottom:6px;margin-bottom:10px">📐 "+sec.title+"</h2>"+fh+"</div>";}else if(sec.type==="exercise"){var sh=(sec.steps||[]).map(function(s,i){return"<div style="display:flex;gap:12px;margin-bottom:10px"><div style="width:26px;height:26px;min-width:26px;background:#00d97e;color:white;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">"+(i+1)+"</div><div><div style="font-size:13px;color:#333">"+s.desc+"</div>"+(s.formula?"<div style="background:#f5f5f5;border-radius:5px;padding:6px 10px;margin-top:5px;direction:ltr;text-align:center">"+s.formula+"</div>":"")+"</div></div>";}).join("");body+="<div style="margin-bottom:2rem"><h2 style="color:#b07a00;font-size:15px;border-bottom:2px solid #ffa726;padding-bottom:6px;margin-bottom:10px">✏️ "+sec.title+"</h2><div style="background:#fffbf0;border:1px solid #ffe0a0;border-radius:8px;padding:14px"><div style="font-size:14px;color:#333;margin-bottom:12px">❓ "+(sec.problem||"")+"</div>"+sh+(sec.answer?"<div style="background:#e6fff4;border:1px solid #00d97e;border-radius:6px;padding:12px;font-size:14px;font-weight:600;color:#007a47;margin-top:12px">✅ "+sec.answer+"</div>":"")+"</div></div>";}else if(sec.type==="highlight"){body+="<div style="margin-bottom:2rem"><h2 style="color:#b07a00;font-size:15px;border-bottom:2px solid #ffa726;padding-bottom:6px;margin-bottom:10px">🎯 "+sec.title+"</h2><div style="background:#fffbf0;border:1px solid #ffc107;border-radius:8px;padding:14px">"+((sec.points||[]).map(function(p){return"<div style="font-size:14px;color:#333;padding:7px 0;border-bottom:1px solid rgba(255,193,7,0.2)">⭐ "+p+"</div>";}).join(""))+"</div></div>";}});}else{(sumData.exercises||[]).forEach(function(ex,i){body+="<div style="background:white;border:1.5px solid #e0e0f0;border-right:4px solid #7c6af7;border-radius:8px;padding:1.5rem;margin-bottom:1.5rem"><span style="background:#7c6af7;color:white;font-size:12px;padding:3px 10px;border-radius:20px">שאלה "+(i+1)+"</span><p style="font-size:15px;color:#1a1a2e;margin:12px 0">"+ex.question+"</p>"+(ex.hint?"<p style="font-size:12px;color:#888;font-style:italic">💡 רמז: "+ex.hint+"</p>":"")+"<div style="margin-top:16px;border-top:1px dashed #ddd;padding-top:12px"><div style="display:flex;flex-direction:column;gap:18px">"+Array(4).fill("<div style="height:1px;background:#e8e8f0"></div>").join("")+"</div></div></div>";});}var html="<!DOCTYPE html><html lang=he dir=rtl><head><meta charset=UTF-8><scr"+"ipt>window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]]}}<\/script><script src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js><\/scr"+"ipt><st"+"yle>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:3rem;direction:rtl;color:#1a1a2e;print-color-adjust:exact;-webkit-print-color-adjust:exact}</st"+"yle></head><body><div style="text-align:center;margin-bottom:3rem;padding:2rem;background:linear-gradient(135deg,#0a0a1f,#1a1a3e);color:white;border-radius:12px"><p style="color:#00d97e;font-weight:700;letter-spacing:3px;font-size:13px;margin-bottom:1rem">ACADEMICRESCUE AI</p><h1 style="font-size:28px;font-weight:900;margin-bottom:8px">"+title+(pdfMode==="exercises"?" — דף תרגילים":"")+"</h1><div style="margin:1rem 0">"+topics+"</div></div>"+body+"<script>window.onload=function(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().then(function(){window.print();});else setTimeout(function(){window.print();},1000);}<\/script></body></html>";w.document.write(html);w.document.close();}
-function startViz(stream){try{actx=new AudioContext();anlz=actx.createAnalyser();anlz.fftSize=256;actx.createMediaStreamSource(stream).connect(anlz);animW();}catch(e){}}
-function animW(){if(!anlz)return;var d=new Uint8Array(anlz.frequencyBinCount);anlz.getByteFrequencyData(d);for(var i=0;i<12;i++){var b=document.getElementById("w"+i);if(!b)continue;var v=d[Math.floor(i*d.length/12)];b.style.height=Math.max(2,Math.min(28,(v/255)*28))+"px";b.style.opacity=Math.max(0.2,v/255);}af=requestAnimationFrame(animW);}
-function stopViz(){if(af){cancelAnimationFrame(af);af=null;}if(actx){actx.close();actx=null;anlz=null;}for(var i=0;i<12;i++){var b=document.getElementById("w"+i);if(b){b.style.height="2px";b.style.opacity="0.2";}}}
-function setInd(id,on){document.getElementById(id).className="ind"+(on?" on":"");}
-function setStep(n){for(var i=1;i<=5;i++){var e=document.getElementById("s"+i);e.className="prog"+(i<n?" done":i===n?" active":"");}}
-function st(msg,type){var e=document.getElementById("status");e.textContent=msg;e.className="status"+(type?" "+type:"");}
-function resetBtn(){var b=document.getElementById("recBtn");b.className="rec-btn idle";b.textContent="🎬  התחל שיעור";}
-function showLoading(text,sub){var o=document.getElementById("loadingOverlay");document.getElementById("loadingText").textContent=text;document.getElementById("loadingSub").textContent=sub;o.className="loading-overlay show";}
-function hideLoading(){document.getElementById("loadingOverlay").className="loading-overlay";}
-var _dp;var _ios=/iphone|ipad|ipod/i.test(navigator.userAgent);var _sa=window.navigator.standalone||window.matchMedia("(display-mode: standalone)").matches;
-if(!_sa){if(_ios){setTimeout(function(){document.getElementById("ib").style.display="block";document.getElementById("ib-ios").style.display="block";},3000);}window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();_dp=e;document.getElementById("ib").style.display="block";document.getElementById("ib-chrome").style.display="block";});}
-function doInstall(){if(!_dp)return;_dp.prompt();_dp.userChoice.then(function(){_dp=null;document.getElementById("ib").style.display="none";});}
-if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js").catch(function(){});}
+<script>
+var BASE = window.location.origin;
+var mode = null, rec = false, mr = null, chunks = [], shots = [], secs = 0;
+var timerInt = null, shotInt = null, sumData = null, txText = '';
+
+document.getElementById('m-file').onclick = function(){ setMode('file'); };
+document.getElementById('m-rec').onclick = function(){ setMode('rec'); };
+document.getElementById('m-live').onclick = function(){ setMode('live'); };
+document.getElementById('m-class').onclick = function(){ setMode('class'); };
+document.getElementById('recBtn').onclick = function(){ toggleRec(); };
+document.getElementById('uploadZone').onclick = function(){ document.getElementById('fileIn').click(); };
+document.getElementById('fileIn').onchange = function(){ if(this.files[0]) doFile(this.files[0]); this.value=''; };
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('m-'+m).classList.add('active');
+  var uz = document.getElementById('uploadZone');
+  var rb = document.getElementById('recBtn');
+  uz.className = 'upload';
+  rb.className = 'btn';
+  if (m === 'file') {
+    uz.className = 'upload show';
+    st('גרור קובץ או לחץ לבחירה', 'ok');
+  } else {
+    rb.className = 'btn show';
+    st('לחץ התחל שיעור', 'ok');
+  }
+}
+
+function toggleRec() {
+  if (rec) stopRec(); else startRec();
+}
+
+async function startRec() {
+  try {
+    var s;
+    if (mode === 'class') {
+      s = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    } else {
+      s = await navigator.mediaDevices.getDisplayMedia({video:{frameRate:1},audio:true});
+      var at = s.getAudioTracks();
+      if (!at.length) { s.getTracks().forEach(function(t){t.stop();}); st('לא נמצא סאונד — סמן Share audio','err'); return; }
+    }
+    var mime = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'].find(function(t){return MediaRecorder.isTypeSupported(t);})||'';
+    mr = new MediaRecorder(new MediaStream(mode==='class'?s.getAudioTracks():s.getAudioTracks()), mime?{mimeType:mime}:{});
+    chunks = []; secs = 0;
+    mr.ondataavailable = function(e){ if(e.data.size>0) chunks.push(e.data); };
+    mr.start(1000);
+    rec = true;
+    document.getElementById('recBtn').className = 'btn show rec';
+    document.getElementById('recBtn').textContent = '⏹ עצור שיעור';
+    st('מקליט...', 'ok');
+    timerInt = setInterval(function(){ secs++; }, 1000);
+  } catch(e) {
+    st('שגיאה: '+e.message, 'err');
+  }
+}
+
+async function stopRec() {
+  clearInterval(timerInt); rec = false;
+  document.getElementById('recBtn').className = 'btn show loading';
+  document.getElementById('recBtn').textContent = '⏳ מעבד...';
+  if (mr && mr.state !== 'inactive') { mr.stop(); await new Promise(function(r){mr.onstop=r;}); }
+  var blob = new Blob(chunks, {type:'audio/webm'});
+  if (blob.size < 8000) { st('ההקלטה קצרה מדי','err'); resetBtn(); return; }
+  await processAudio(blob, []);
+}
+
+async function doFile(file) {
+  st('מתמלל: '+file.name, 'proc');
+  showLoad('📝 מתמלל...');
+  try {
+    var fd = new FormData();
+    fd.append('file', file, file.name);
+    var r = await fetch(BASE+'/transcribe', {method:'POST', body:fd});
+    if (!r.ok) throw new Error(await r.text());
+    var d = await r.json();
+    txText = d.text || '';
+    showLoad('🧠 מסכם...');
+    var sr = await fetch(BASE+'/summarize', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({transcript:txText, screen_text:'', segments:d.segments||[], shots_meta:[]})});
+    if (!sr.ok) throw new Error(await sr.text());
+    sumData = await sr.json();
+    secs = Math.round(file.size/16000);
+    showSummary(sumData, txText, 0);
+    st('הסיכום מוכן! 🎉', 'ok');
+  } catch(e) {
+    st('שגיאה: '+e.message, 'err');
+    document.getElementById('out').innerHTML = '<div class="card"><div style="color:#ff4757">שגיאה: '+e.message+'</div></div>';
+  }
+}
+
+async function processAudio(blob, screenshots) {
+  showLoad('📝 מתמלל...');
+  try {
+    var fd = new FormData();
+    fd.append('file', blob, 'rec.webm');
+    var r = await fetch(BASE+'/transcribe', {method:'POST', body:fd});
+    if (!r.ok) throw new Error(await r.text());
+    var d = await r.json();
+    txText = d.text || '';
+    showLoad('🧠 מסכם...');
+    var sr = await fetch(BASE+'/summarize', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({transcript:txText, screen_text:'', segments:d.segments||[], shots_meta:[]})});
+    if (!sr.ok) throw new Error(await sr.text());
+    sumData = await sr.json();
+    showSummary(sumData, txText, 0);
+    st('הסיכום מוכן! 🎉', 'ok');
+    resetBtn();
+  } catch(e) {
+    st('שגיאה: '+e.message, 'err');
+    resetBtn();
+  }
+}
+
+function showSummary(data, transcript, shotCount) {
+  var html = '<div class="card"><div style="font-size:20px;font-weight:900;margin-bottom:6px;">'+(data.title||'סיכום השיעור')+'</div>';
+  html += '<div style="font-size:11px;color:#55556a;margin-bottom:10px;">⏱ '+Math.floor(secs/60)+' דקות</div>';
+  html += '<div>'+(data.topics||[]).map(function(t){return'<span class="chip">'+t+'</span>';}).join('')+'</div></div>';
+
+  (data.sections||[]).forEach(function(sec) {
+    if (sec.type==='explanation') {
+      html += '<div class="card"><div class="sec-title" style="color:#00d97e">📖 '+sec.title+'</div><div class="result">'+(sec.content||'').replace(/\n/g,'<br>')+'</div></div>';
+    } else if (sec.type==='formula') {
+      var fh = (sec.formulas||[]).map(function(f){
+        return '<div class="formula-box"><div style="font-size:11px;font-weight:700;color:#7c6af7;margin-bottom:6px;">'+f.name+'</div><div class="formula-latex">'+f.latex+'</div><div style="font-size:12px;color:#55556a;margin-top:6px;">💡 '+f.meaning+'</div></div>';
+      }).join('');
+      html += '<div class="card"><div class="sec-title" style="color:#7c6af7">📐 '+sec.title+'</div>'+fh+'</div>';
+    } else if (sec.type==='exercise') {
+      var sh = (sec.steps||[]).map(function(s,i){return '<div class="ex-step"><div class="ex-num">'+(i+1)+'</div><div><div style="font-size:13px;color:#9090aa;">'+s.desc+'</div>'+(s.formula?'<div style="font-size:13px;color:#f0f0f5;background:#1a1a24;border-radius:5px;padding:5px 10px;margin-top:4px;direction:ltr;text-align:center;">'+s.formula+'</div>':'')+'</div></div>';}).join('');
+      html += '<div class="card"><div class="sec-title" style="color:#ffa726">✏️ '+sec.title+'</div><div style="background:#1a1a24;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;color:#9090aa;">❓ '+(sec.problem||'')+'</div>'+sh+(sec.answer?'<div style="background:rgba(0,217,126,0.1);border:1px solid rgba(0,217,126,0.25);border-radius:8px;padding:12px;font-size:13px;font-weight:600;color:#00d97e;margin-top:10px;">✅ '+sec.answer+'</div>':'')+'</div>';
+    } else if (sec.type==='highlight') {
+      html += '<div class="card" style="background:rgba(255,167,38,0.05);border-color:rgba(255,167,38,0.15);"><div class="sec-title" style="color:#ffa726">🎯 '+sec.title+'</div>'+((sec.points||[]).map(function(p){return'<div style="font-size:13px;color:#9090aa;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);">⭐ '+p+'</div>';}).join(''))+'</div>';
+    }
+  });
+
+  if (transcript) {
+    html += '<div class="card"><div class="sec-title" style="color:#55556a;">תמלול מלא</div><div style="font-size:13px;color:#9090aa;line-height:1.8;max-height:140px;overflow-y:auto;">'+transcript+'</div></div>';
+  }
+
+  html += '<div class="card"><div class="act-row"><button class="act-btn act-g" id="btnPDF">📄 סיכום PDF</button><button class="act-btn act-p" id="btnEx">📝 דף תרגילים</button></div></div>';
+
+  document.getElementById('out').innerHTML = html;
+  document.getElementById('btnPDF').onclick = function(){ exportPDF('summary'); };
+  document.getElementById('btnEx').onclick = function(){ exportPDF('exercises'); };
+
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([document.getElementById('out')]);
+}
+
+function exportPDF(m) {
+  if (!sumData) return;
+  var w = window.open('', '_blank');
+  var title = sumData.title || 'סיכום';
+  var body = '';
+  if (m === 'summary') {
+    (sumData.sections||[]).forEach(function(sec){
+      if (sec.type==='explanation') body += '<h2>📖 '+sec.title+'</h2><p>'+(sec.content||'').replace(/\n/g,'<br>')+'</p>';
+      else if (sec.type==='formula') body += '<h2>📐 '+sec.title+'</h2>'+((sec.formulas||[]).map(function(f){return '<div style="background:#f8f7ff;border:1px solid #e0ddff;border-radius:8px;padding:12px;margin:8px 0"><b style="color:#7c6af7">'+f.name+'</b><div style="text-align:center;font-size:15px;padding:8px;direction:ltr">'+f.latex+'</div><div style="color:#666;font-size:12px">💡 '+f.meaning+'</div></div>';}).join(''));
+      else if (sec.type==='exercise') body += '<h2>✏️ '+sec.title+'</h2><div style="background:#fffbf0;border:1px solid #ffe0a0;border-radius:8px;padding:12px"><p>❓ '+(sec.problem||'')+'</p>'+((sec.steps||[]).map(function(s,i){return '<p>'+(i+1)+'. '+s.desc+(s.formula?' — <code>'+s.formula+'</code>':'')+'</p>';}).join(''))+(sec.answer?'<p style="color:#007a47;font-weight:bold">✅ '+sec.answer+'</p>':'')+'</div>';
+      else if (sec.type==='highlight') body += '<h2>🎯 '+sec.title+'</h2>'+((sec.points||[]).map(function(p){return '<p>⭐ '+p+'</p>';}).join(''));
+    });
+  } else {
+    (sumData.exercises||[]).forEach(function(ex,i){
+      body += '<div style="border:1.5px solid #e0e0f0;border-radius:8px;padding:1rem;margin:1rem 0"><b>שאלה '+(i+1)+'</b><p>'+ex.question+'</p>'+(ex.hint?'<p style="color:#888;font-style:italic">💡 '+ex.hint+'</p>':'')+'<div style="border-top:1px dashed #ddd;margin-top:12px;padding-top:12px;height:80px;"></div></div>';
+    });
+  }
+  w.document.write('<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>'+title+'</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:2rem;direction:rtl;}h2{color:#333;margin:1.5rem 0 0.5rem;}</style></head><body><h1>'+title+'</h1>'+body+'<script>window.onload=function(){window.print();}<\/script></body></html>');
+  w.document.close();
+}
+
+function showLoad(msg) {
+  document.getElementById('out').innerHTML = '<div class="card" style="text-align:center;padding:3rem;color:#55556a;"><div style="font-size:32px;margin-bottom:1rem;">'+msg.split(' ')[0]+'</div><div>'+msg+'</div></div>';
+}
+function st(msg,type){ var e=document.getElementById('status'); e.textContent=msg; e.className='status'+(type?' '+type:''); }
+function resetBtn(){ var b=document.getElementById('recBtn'); b.className='btn show'; b.textContent='🎬 התחל שיעור'; }
 </script>
 </body>
 </html>
