@@ -3,252 +3,1456 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AcademicRescue AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#020208">
+<title>AcademicRescue AI — סיכום שיעורים חכם</title>
+<link rel="manifest" href="/static/manifest.json">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+Hebrew:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:Heebo,sans-serif;background:#0a0a0f;color:#f0f0f5;min-height:100vh;}
-nav{background:#111118;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.logo{font-size:18px;font-weight:900;}.logo span{color:#00d97e;}
-.app{max-width:800px;margin:0 auto;padding:1.5rem 1rem;}
-.card{background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:1.5rem;margin-bottom:1rem;}
-.label{font-size:11px;font-weight:700;color:#55556a;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
-.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
-@media(min-width:600px){.modes{grid-template-columns:repeat(4,1fr);}}
-.mode{background:#1a1a24;border:2px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;text-align:center;cursor:pointer;}
-.mode:hover{border-color:#00d97e;background:rgba(0,217,126,0.1);}
-.mode.active{border-color:#00d97e;background:rgba(0,217,126,0.1);}
-.mode-icon{font-size:24px;margin-bottom:6px;}
-.mode-title{font-size:12px;font-weight:700;}
-.mode-desc{font-size:10px;color:#55556a;margin-top:2px;}
-.upload{border:2px dashed rgba(255,255,255,0.13);border-radius:12px;padding:3rem;text-align:center;cursor:pointer;display:none;}
-.upload.show{display:block;}
-.upload:hover{border-color:#00d97e;background:rgba(0,217,126,0.05);}
-.btn{width:100%;padding:14px;background:#00d97e;color:#001a0e;border:none;border-radius:10px;font-family:Heebo,sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:none;margin-bottom:8px;}
-.btn.show{display:block;}
-.btn.rec{background:#ff4757;color:white;}
-.btn.loading{background:#1a1a24;color:#55556a;cursor:not-allowed;}
-.status{text-align:center;font-size:12px;color:#55556a;min-height:18px;}
-.status.ok{color:#00d97e;}.status.err{color:#ff4757;}.status.proc{color:#7c6af7;}
-.empty{padding:4rem;text-align:center;color:#55556a;}
-.empty-icon{font-size:56px;opacity:0.2;margin-bottom:1rem;}
-.result{font-size:14px;color:#9090aa;line-height:1.9;}
-.chip{display:inline-block;background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.2);color:#7c6af7;font-size:11px;padding:3px 10px;border-radius:20px;margin:2px;}
-.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
-.formula-box{background:rgba(124,106,247,0.07);border:1px solid rgba(124,106,247,0.18);border-radius:8px;padding:12px;margin-bottom:8px;}
-.formula-latex{text-align:center;padding:8px 0;direction:ltr;font-size:15px;}
-.ex-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
-.ex-num{width:24px;height:24px;min-width:24px;background:rgba(0,217,126,0.1);border-radius:50%;font-size:11px;font-weight:700;color:#00d97e;display:flex;align-items:center;justify-content:center;}
-.act-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem;}
-.act-btn{padding:10px 14px;border-radius:8px;border:1.5px solid;background:transparent;font-family:Heebo,sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
-.act-g{border-color:#00d97e;color:#00d97e;}.act-p{border-color:#7c6af7;color:#7c6af7;}
+:root {
+  --void: #020208;
+  --deep: #06060f;
+  --surface: #0c0c1a;
+  --elevated: #111125;
+  --border: rgba(99,102,241,0.12);
+  --border-bright: rgba(99,102,241,0.35);
+  --indigo: #6366f1;
+  --indigo-bright: #818cf8;
+  --indigo-dim: rgba(99,102,241,0.08);
+  --green: #10b981;
+  --green-dim: rgba(16,185,129,0.08);
+  --green-bright: #34d399;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
+  --glow: 0 0 40px rgba(99,102,241,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  background: var(--void);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Animated background */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-canvas canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+}
+
+.bg-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(99,102,241,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(16,185,129,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(2,2,8,0.9) 0%, transparent 100%);
+}
+
+/* Nav */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(2,2,8,0.8);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.nav-logo em {
+  font-style: normal;
+  color: var(--indigo-bright);
+}
+
+.nav-badge {
+  background: var(--indigo-dim);
+  border: 1px solid var(--border-bright);
+  color: var(--indigo-bright);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Main container */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 6rem;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 3rem 0 2.5rem;
+  animation: fadeUp 0.7s ease both;
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--indigo-bright);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--indigo-bright));
+}
+.hero-eyebrow::after {
+  background: linear-gradient(90deg, var(--indigo-bright), transparent);
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 6vw, 52px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 16px;
+  color: var(--text2);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Main card */
+.main-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+  animation: fadeUp 0.7s ease 0.1s both;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--indigo-bright), transparent);
+  opacity: 0.4;
+}
+
+/* Section label */
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+
+/* Mode grid */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 600px) {
+  .mode-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.mode-card {
+  position: relative;
+  background: var(--elevated);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  overflow: hidden;
+  user-select: none;
+}
+
+.mode-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--indigo-dim), transparent);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.mode-card:hover {
+  border-color: var(--border-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.1);
+}
+
+.mode-card:hover::after { opacity: 1; }
+
+.mode-card.active {
+  border-color: var(--indigo);
+  background: var(--indigo-dim);
+  box-shadow: 0 0 0 1px var(--indigo), var(--glow);
+}
+
+.mode-card.active::after { opacity: 1; }
+
+.mode-emoji {
+  font-size: 26px;
+  margin-bottom: 8px;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.mode-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.mode-sub {
+  font-size: 10px;
+  color: var(--text3);
+  position: relative;
+  z-index: 1;
+}
+
+/* Upload zone */
+.upload-zone {
+  border: 1.5px dashed var(--border-bright);
+  border-radius: 14px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: none;
+  margin-bottom: 1.25rem;
+  background: var(--indigo-dim);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone.visible { display: block; animation: fadeUp 0.3s ease; }
+.upload-zone:hover, .upload-zone.drag {
+  border-color: var(--indigo-bright);
+  background: rgba(99,102,241,0.12);
+}
+
+.upload-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  background: var(--elevated);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.upload-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: var(--text3); }
+
+/* Info banner */
+.info-banner {
+  background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(16,185,129,0.04));
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+  display: none;
+}
+.info-banner.visible { display: block; animation: fadeUp 0.3s ease; }
+.info-banner strong { color: var(--indigo-bright); }
+
+/* Live stats */
+.live-stats {
+  display: none;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+.live-stats.visible { display: flex; }
+
+.stat-pill {
+  flex: 1;
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.stat-pill.active {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+.stat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text3);
+  margin: 0 auto 6px;
+  transition: all 0.3s;
+}
+.stat-pill.active .stat-dot {
+  background: var(--green-bright);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse-dot 1.4s ease infinite;
+}
+.stat-label { font-size: 10px; color: var(--text3); }
+.stat-pill.active .stat-label { color: var(--green-bright); }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* Waveform */
+.waveform {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 44px;
+  margin-bottom: 1rem;
+}
+.waveform.visible { display: flex; }
+.wbar {
+  width: 3px;
+  background: linear-gradient(180deg, var(--indigo-bright), var(--green-bright));
+  border-radius: 2px;
+  height: 3px;
+  transition: height 0.06s ease;
+}
+
+/* Timer */
+.timer-display {
+  font-family: 'Syne', monospace;
+  font-size: 52px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: none;
+  margin-bottom: 0.5rem;
+}
+.timer-display.visible { display: block; animation: fadeUp 0.3s ease; }
+
+/* Progress steps */
+.progress-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 1.25rem;
+  direction: ltr;
+  display: none;
+}
+.progress-steps.visible { display: flex; }
+
+.pstep {
+  flex: 1;
+  padding: 8px 4px;
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--text3);
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.pstep.done { background: var(--green-dim); border-color: var(--green); color: var(--green-bright); }
+.pstep.active { background: var(--indigo-dim); border-color: var(--indigo); color: var(--indigo-bright); font-weight: 600; }
+
+/* CTA Button */
+.cta-btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+  display: none;
+}
+.cta-btn.visible { display: block; }
+.cta-btn.idle {
+  background: linear-gradient(135deg, var(--indigo) 0%, #4f46e5 100%);
+  color: white;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.35);
+}
+.cta-btn.idle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(99,102,241,0.45);
+}
+.cta-btn.idle:active { transform: translateY(0); }
+.cta-btn.recording {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 24px rgba(239,68,68,0.35);
+  animation: rec-pulse 2s ease infinite;
+}
+.cta-btn.loading {
+  background: var(--elevated);
+  color: var(--text3);
+  cursor: not-allowed;
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+@keyframes rec-pulse {
+  0%, 100% { box-shadow: 0 4px 24px rgba(239,68,68,0.35); }
+  50% { box-shadow: 0 4px 48px rgba(239,68,68,0.6); }
+}
+
+/* Status */
+.status-line {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text3);
+  min-height: 18px;
+  transition: color 0.3s;
+}
+.status-line.ok { color: var(--green-bright); }
+.status-line.err { color: var(--red); }
+.status-line.proc { color: var(--indigo-bright); }
+
+/* Output area */
+#output { animation: fadeUp 0.5s ease; }
+
+/* Summary styles */
+.sum-hero {
+  background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(16,185,129,0.05) 100%);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.sum-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--indigo-bright), var(--green-bright), transparent);
+  opacity: 0.5;
+}
+
+.sum-title-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sum-meta-row {
+  display: flex;
+  gap: 16px;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 14px;
+}
+
+.sum-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.topic-tag {
+  background: var(--indigo-dim);
+  border: 1px solid var(--border-bright);
+  color: var(--indigo-bright);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.output-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+.output-card:hover { border-color: var(--border-bright); }
+
+.card-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.card-body { font-size: 14px; color: var(--text2); line-height: 1.9; }
+
+.formula-block {
+  background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(99,102,241,0.02));
+  border: 1px solid rgba(99,102,241,0.2);
+  border-right: 3px solid var(--indigo);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 10px;
+}
+
+.formula-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.formula-title { font-size: 11px; font-weight: 700; color: var(--indigo-bright); text-transform: uppercase; letter-spacing: 0.5px; }
+.formula-src-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+.src-screen { background: var(--green-dim); color: var(--green-bright); }
+.src-voice { background: var(--indigo-dim); color: var(--indigo-bright); }
+.src-both { background: rgba(245,158,11,0.1); color: var(--amber); }
+.formula-latex { font-size: 16px; color: var(--text); text-align: center; padding: 12px 0; direction: ltr; }
+.formula-meaning { font-size: 12px; color: var(--text3); border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px; }
+
+.exercise-problem {
+  background: var(--elevated);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+
+.step-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+.step-num {
+  width: 28px; height: 28px; min-width: 28px;
+  background: linear-gradient(135deg, var(--indigo), #4f46e5);
+  border-radius: 50%;
+  font-size: 12px; font-weight: 700; color: white;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+}
+.step-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.step-formula {
+  font-size: 13px; color: var(--text);
+  background: var(--elevated); border-radius: 6px;
+  padding: 6px 12px; direction: ltr; text-align: center; margin-top: 6px;
+}
+.step-answer {
+  background: var(--green-dim);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px; font-weight: 600; color: var(--green-bright);
+  margin-top: 12px;
+}
+
+.highlight-box {
+  background: linear-gradient(135deg, rgba(245,158,11,0.05), rgba(245,158,11,0.02));
+  border: 1px solid rgba(245,158,11,0.2);
+  border-right: 3px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px;
+}
+.highlight-point {
+  font-size: 13px; color: var(--text2);
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.highlight-point:last-child { border-bottom: none; padding-bottom: 0; }
+.highlight-star { color: var(--amber); flex-shrink: 0; }
+
+.transcript-box {
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+  max-height: 140px; overflow-y: auto;
+}
+.transcript-box::-webkit-scrollbar { width: 3px; }
+.transcript-box::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+/* Action buttons */
+.actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.action-btn {
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: 1.5px solid;
+  background: transparent;
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.action-indigo { border-color: var(--indigo); color: var(--indigo-bright); }
+.action-indigo:hover { background: var(--indigo-dim); box-shadow: 0 0 20px rgba(99,102,241,0.15); }
+.action-green { border-color: var(--green); color: var(--green-bright); }
+.action-green:hover { background: var(--green-dim); }
+
+/* Empty state */
+.empty-state {
+  padding: 5rem 2rem;
+  text-align: center;
+  color: var(--text3);
+}
+.empty-orb {
+  width: 80px; height: 80px;
+  margin: 0 auto 1.5rem;
+  background: radial-gradient(circle, rgba(99,102,241,0.15), transparent);
+  border: 1px solid var(--border-bright);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  animation: float 4s ease-in-out infinite;
+}
+.empty-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
+.empty-sub { font-size: 13px; line-height: 1.6; max-width: 320px; margin: 0 auto; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: rgba(2,2,8,0.85);
+  backdrop-filter: blur(12px);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.loading-overlay.visible { display: flex; }
+
+.loading-orb {
+  width: 72px; height: 72px;
+  border: 2px solid var(--border);
+  border-top-color: var(--indigo-bright);
+  border-right-color: var(--green-bright);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.loading-sub { font-size: 12px; color: var(--text3); }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Install banner */
+#install-banner {
+  display: none;
+  position: fixed; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem); max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 16px;
+  padding: 16px 18px;
+  z-index: 9999;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5), var(--glow);
+  animation: fadeUp 0.4s ease;
+}
+
+.install-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.install-icon { font-size: 28px; }
+.install-title { font-size: 14px; font-weight: 700; }
+.install-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.install-close { margin-right: auto; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 20px; }
+
+#install-ios-steps {
+  background: var(--elevated);
+  border-radius: 10px; padding: 12px 14px;
+  font-size: 12px; color: var(--text2); line-height: 2;
+}
+#install-ios-steps strong { color: var(--indigo-bright); }
+#install-chrome-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--indigo), #4f46e5);
+  color: white; border: none; border-radius: 10px;
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+@media (max-width: 600px) {
+  .container { padding: 1.5rem 1rem 5rem; }
+  .main-card { padding: 1.25rem; }
+  .hero { padding: 2rem 0 1.5rem; }
+  .hero-title { font-size: 28px; }
+  .timer-display { font-size: 38px; }
+}
 </style>
 </head>
 <body>
+
+<!-- Animated background -->
+<div class="bg-canvas">
+  <canvas id="bgCanvas"></canvas>
+  <div class="bg-gradient"></div>
+</div>
+
+<!-- Nav -->
 <nav>
-  <div class="logo">Academic<span>Rescue</span></div>
-  <div style="font-size:11px;color:#55556a;">סיכום שיעורים חכם</div>
+  <div class="nav-logo">Academic<em>Rescue</em></div>
+  <div class="nav-badge">AI Beta</div>
 </nav>
-<div class="app">
-  <div class="card">
-    <div class="label">מה אתה רוצה לסכם?</div>
-    <div class="modes">
-      <div class="mode" id="m-file"><div class="mode-icon">📁</div><div class="mode-title">העלאת קובץ</div><div class="mode-desc">MP4, MP3, WAV</div></div>
-      <div class="mode" id="m-rec"><div class="mode-icon">🎬</div><div class="mode-title">הקלטה שמורה</div><div class="mode-desc">מסך + סאונד</div></div>
-      <div class="mode" id="m-live"><div class="mode-icon">📡</div><div class="mode-title">שיעור חי</div><div class="mode-desc">זום פתוח</div></div>
-      <div class="mode" id="m-class"><div class="mode-icon">🏫</div><div class="mode-title">כיתה פיזית</div><div class="mode-desc">מיקרופון</div></div>
-    </div>
-    <div class="upload" id="uploadZone">
-      <div style="font-size:36px;margin-bottom:10px;">📎</div>
-      <div style="font-size:14px;color:#9090aa;">גרור קובץ לכאן או לחץ לבחירה</div>
-      <div style="font-size:11px;color:#55556a;margin-top:4px;">MP4 · MP3 · WAV · M4A</div>
-    </div>
-    <input type="file" id="fileIn" accept="audio/*,video/*" style="display:none">
-    <button class="btn" id="recBtn">🎬 התחל שיעור</button>
-    <div class="status" id="status">בחר מצב כדי להתחיל</div>
+
+<!-- Main -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">מבוסס Whisper + GPT-4o</div>
+    <h1 class="hero-title">הקלט שיעור.<br>קבל סיכום מושלם.</h1>
+    <p class="hero-sub">הבינה המלאכותית מתמללת, מנתחת צילומי מסך, ומייצרת סיכום מובנה עם נוסחאות — תוך דקות.</p>
   </div>
-  <div id="out">
-    <div class="empty">
-      <div class="empty-icon">🎓</div>
-      <div style="font-size:18px;font-weight:700;color:#9090aa;margin-bottom:6px;">מוכן לסכם</div>
-      <div style="font-size:13px;">בחר מצב למעלה והתחל</div>
+
+  <!-- Main card -->
+  <div class="main-card">
+    <div class="section-label">בחר מצב הקלטה</div>
+
+    <div class="mode-grid">
+      <div class="mode-card" id="m-file">
+        <span class="mode-emoji">📁</span>
+        <div class="mode-name">העלאת קובץ</div>
+        <div class="mode-sub">MP4, MP3, WAV</div>
+      </div>
+      <div class="mode-card" id="m-rec">
+        <span class="mode-emoji">🎬</span>
+        <div class="mode-name">הקלטה שמורה</div>
+        <div class="mode-sub">מסך + סאונד</div>
+      </div>
+      <div class="mode-card" id="m-live">
+        <span class="mode-emoji">📡</span>
+        <div class="mode-name">שיעור חי</div>
+        <div class="mode-sub">זום פתוח</div>
+      </div>
+      <div class="mode-card" id="m-class">
+        <span class="mode-emoji">🏫</span>
+        <div class="mode-name">כיתה פיזית</div>
+        <div class="mode-sub">מיקרופון</div>
+      </div>
     </div>
+
+    <!-- Info banner -->
+    <div class="info-banner" id="infoBanner">
+      <strong>🧠 זיהוי חכם:</strong> האפליקציה מאזינה בזמן אמת. כשמזוהות מילות מפתח כמו "תרגיל", "דוגמה", "נסתכל" — צילום מסך אוטומטי. בסיכום, כל נוסחה מוצלבת עם הצילום מאותה שנייה.
+    </div>
+
+    <!-- Upload zone -->
+    <div class="upload-zone" id="uploadZone"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="onDrop(event)">
+      <div class="upload-icon">📎</div>
+      <div class="upload-title">גרור קובץ לכאן</div>
+      <div class="upload-sub">או לחץ לבחירה · MP4 · MP3 · WAV · M4A</div>
+    </div>
+    <input type="file" id="fileInput" accept="audio/*,video/*" style="display:none">
+
+    <!-- Live stats -->
+    <div class="live-stats" id="liveStats">
+      <div class="stat-pill" id="statAudio">
+        <div class="stat-dot"></div>
+        <div class="stat-label" id="statAudioLbl">סאונד</div>
+      </div>
+      <div class="stat-pill" id="statScreen">
+        <div class="stat-dot"></div>
+        <div class="stat-label">מסך</div>
+      </div>
+      <div class="stat-pill" id="statShots">
+        <div class="stat-dot"></div>
+        <div class="stat-label" id="statShotsLbl">0 צילומים</div>
+      </div>
+    </div>
+
+    <!-- Waveform -->
+    <div class="waveform" id="waveform">
+      <div class="wbar" id="w0"></div><div class="wbar" id="w1"></div>
+      <div class="wbar" id="w2"></div><div class="wbar" id="w3"></div>
+      <div class="wbar" id="w4"></div><div class="wbar" id="w5"></div>
+      <div class="wbar" id="w6"></div><div class="wbar" id="w7"></div>
+      <div class="wbar" id="w8"></div><div class="wbar" id="w9"></div>
+      <div class="wbar" id="w10"></div><div class="wbar" id="w11"></div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-display" id="timer">00:00</div>
+
+    <!-- Progress -->
+    <div class="progress-steps" id="progressSteps">
+      <div class="pstep" id="ps1">🎬 הקלטה</div>
+      <div class="pstep" id="ps2">📝 תמלול</div>
+      <div class="pstep" id="ps3">👁 מסך</div>
+      <div class="pstep" id="ps4">🧠 סיכום</div>
+      <div class="pstep" id="ps5">✅ מוכן</div>
+    </div>
+
+    <!-- CTA -->
+    <button class="cta-btn" id="ctaBtn">🎬  התחל שיעור</button>
+    <div class="status-line" id="statusLine">בחר מצב כדי להתחיל</div>
+  </div>
+
+  <!-- Output -->
+  <div id="output">
+    <div class="empty-state">
+      <div class="empty-orb">🎓</div>
+      <div class="empty-title">מוכן לסכם</div>
+      <div class="empty-sub">בחר מצב למעלה והתחל. הסיכום יופיע כאן תוך דקות.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-orb"></div>
+  <div class="loading-title" id="loadingTitle">מעבד...</div>
+  <div class="loading-sub" id="loadingSub"></div>
+</div>
+
+<!-- Install banner -->
+<div id="install-banner">
+  <div class="install-row">
+    <div class="install-icon">🎓</div>
+    <div>
+      <div class="install-title">התקן כאפליקציה</div>
+      <div class="install-sub">גישה מהירה מהמסך הראשי</div>
+    </div>
+    <button class="install-close" onclick="document.getElementById('install-banner').style.display='none'">×</button>
+  </div>
+  <div id="install-chrome-wrap" style="display:none">
+    <button id="install-chrome-btn" onclick="doInstall()">✅ התקן עכשיו</button>
+  </div>
+  <div id="install-ios-steps" style="display:none">
+    <div style="font-weight:600;color:var(--indigo-bright);margin-bottom:6px;">3 שניות להתקנה:</div>
+    <div>① לחץ <strong>□↑</strong> בתחתית Safari</div>
+    <div>② בחר <strong>"הוסף למסך הבית"</strong></div>
+    <div>③ לחץ <strong style="color:var(--green-bright)">"הוסף"</strong></div>
   </div>
 </div>
-<script>
-var BASE = window.location.origin;
-var mode = null, rec = false, mr = null, chunks = [], shots = [], secs = 0;
-var timerInt = null, shotInt = null, sumData = null, txText = '';
 
+<script>
+// ─── Config ────────────────────────────────────────────────────
+var BASE = window.location.origin;
+var TRIGGERS = ['תרגיל','דוגמה','דוגמא','נסתכל','הנה','ניפתור','שאלה','נחשב','נכתוב','נרשום','לדוגמה','למשל','נראה','פתרון','חישוב','נציב','נגזור','נבדוק'];
+
+// ─── State ─────────────────────────────────────────────────────
+var mode = null, rec = false, mr = null, chunks = [], shots = [];
+var timerInt = null, shotInt = null, triggerInt = null;
+var secs = 0, videoEl = null, actx = null, anlz = null, af = null;
+var audioBuffer = [], segments = [], sumData = null, txText = '';
+var lastTrigger = 0, deferredInstall = null;
+
+// ─── Init ──────────────────────────────────────────────────────
 document.getElementById('m-file').onclick = function(){ setMode('file'); };
 document.getElementById('m-rec').onclick = function(){ setMode('rec'); };
 document.getElementById('m-live').onclick = function(){ setMode('live'); };
 document.getElementById('m-class').onclick = function(){ setMode('class'); };
-document.getElementById('recBtn').onclick = function(){ toggleRec(); };
-document.getElementById('uploadZone').onclick = function(){ document.getElementById('fileIn').click(); };
-document.getElementById('fileIn').onchange = function(){ if(this.files[0]) doFile(this.files[0]); this.value=''; };
+document.getElementById('ctaBtn').onclick = toggleRec;
+document.getElementById('uploadZone').onclick = function(){ document.getElementById('fileInput').click(); };
+document.getElementById('fileInput').onchange = function(){ if(this.files[0]) doFile(this.files[0]); this.value=''; };
 
+// ─── Background canvas ─────────────────────────────────────────
+(function(){
+  var canvas = document.getElementById('bgCanvas');
+  var ctx = canvas.getContext('2d');
+  var dots = [];
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for(var i=0; i<60; i++){
+    dots.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 1.5 + 0.5,
+      vx: (Math.random()-0.5)*0.3,
+      vy: (Math.random()-0.5)*0.3,
+      opacity: Math.random()*0.5+0.1
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    dots.forEach(function(d){
+      d.x += d.vx; d.y += d.vy;
+      if(d.x<0) d.x=canvas.width; if(d.x>canvas.width) d.x=0;
+      if(d.y<0) d.y=canvas.height; if(d.y>canvas.height) d.y=0;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(99,102,241,'+d.opacity+')';
+      ctx.fill();
+    });
+    // Connect nearby dots
+    for(var i=0;i<dots.length;i++){
+      for(var j=i+1;j<dots.length;j++){
+        var dx=dots[i].x-dots[j].x, dy=dots[i].y-dots[j].y;
+        var dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(dots[i].x,dots[i].y);
+          ctx.lineTo(dots[j].x,dots[j].y);
+          ctx.strokeStyle='rgba(99,102,241,'+(0.06*(1-dist/120))+')';
+          ctx.lineWidth=0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ─── Mode ──────────────────────────────────────────────────────
 function setMode(m) {
   mode = m;
-  document.querySelectorAll('.mode').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.mode-card').forEach(function(el){ el.classList.remove('active'); });
   document.getElementById('m-'+m).classList.add('active');
-  var uz = document.getElementById('uploadZone');
-  var rb = document.getElementById('recBtn');
-  uz.className = 'upload';
-  rb.className = 'btn';
+
+  var upload = document.getElementById('uploadZone');
+  var btn = document.getElementById('ctaBtn');
+  var info = document.getElementById('infoBanner');
+  var liveStats = document.getElementById('liveStats');
+  var prog = document.getElementById('progressSteps');
+
+  upload.className = 'upload-zone';
+  btn.className = 'cta-btn';
+  info.className = 'info-banner';
+  liveStats.className = 'live-stats';
+  prog.className = 'progress-steps';
+
   if (m === 'file') {
-    uz.className = 'upload show';
+    upload.className = 'upload-zone visible';
     st('גרור קובץ או לחץ לבחירה', 'ok');
   } else {
-    rb.className = 'btn show';
-    st('לחץ התחל שיעור', 'ok');
+    btn.className = 'cta-btn visible idle';
+    liveStats.className = 'live-stats visible';
+    prog.className = 'progress-steps visible';
+    if (m !== 'class') info.className = 'info-banner visible';
+    st('לחץ "התחל שיעור" כשאתה מוכן', 'ok');
   }
 }
 
-function toggleRec() {
-  if (rec) stopRec(); else startRec();
-}
-
-async function startRec() {
-  try {
-    var s;
-    if (mode === 'class') {
-      s = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-    } else {
-      s = await navigator.mediaDevices.getDisplayMedia({video:{frameRate:1},audio:true});
-      var at = s.getAudioTracks();
-      if (!at.length) { s.getTracks().forEach(function(t){t.stop();}); st('לא נמצא סאונד — סמן Share audio','err'); return; }
-    }
-    var mime = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'].find(function(t){return MediaRecorder.isTypeSupported(t);})||'';
-    mr = new MediaRecorder(new MediaStream(mode==='class'?s.getAudioTracks():s.getAudioTracks()), mime?{mimeType:mime}:{});
-    chunks = []; secs = 0;
-    mr.ondataavailable = function(e){ if(e.data.size>0) chunks.push(e.data); };
-    mr.start(1000);
-    rec = true;
-    document.getElementById('recBtn').className = 'btn show rec';
-    document.getElementById('recBtn').textContent = '⏹ עצור שיעור';
-    st('מקליט...', 'ok');
-    timerInt = setInterval(function(){ secs++; }, 1000);
-  } catch(e) {
-    st('שגיאה: '+e.message, 'err');
-  }
-}
-
-async function stopRec() {
-  clearInterval(timerInt); rec = false;
-  document.getElementById('recBtn').className = 'btn show loading';
-  document.getElementById('recBtn').textContent = '⏳ מעבד...';
-  if (mr && mr.state !== 'inactive') { mr.stop(); await new Promise(function(r){mr.onstop=r;}); }
-  var blob = new Blob(chunks, {type:'audio/webm'});
-  if (blob.size < 8000) { st('ההקלטה קצרה מדי','err'); resetBtn(); return; }
-  await processAudio(blob, []);
+// ─── File upload ───────────────────────────────────────────────
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag');
+  var file = e.dataTransfer.files[0];
+  if (file) doFile(file);
 }
 
 async function doFile(file) {
   st('מתמלל: '+file.name, 'proc');
-  showLoad('📝 מתמלל...');
+  showLoading('📝 מתמלל קובץ...', file.name);
+  setStep(2);
   try {
     var fd = new FormData();
     fd.append('file', file, file.name);
     var r = await fetch(BASE+'/transcribe', {method:'POST', body:fd});
     if (!r.ok) throw new Error(await r.text());
     var d = await r.json();
-    txText = d.text || '';
-    showLoad('🧠 מסכם...');
-    var sr = await fetch(BASE+'/summarize', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({transcript:txText, screen_text:'', segments:d.segments||[], shots_meta:[]})});
+    txText = d.text||''; segments = d.segments||[];
+
+    showLoading('🧠 מסכם ומנתח...', '');
+    setStep(4);
+    var sr = await fetch(BASE+'/summarize', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({transcript:txText, screen_text:'', segments:segments, shots_meta:[]})
+    });
     if (!sr.ok) throw new Error(await sr.text());
     sumData = await sr.json();
     secs = Math.round(file.size/16000);
-    showSummary(sumData, txText, 0);
+    hideLoading();
+    setStep(5);
+    renderSummary(sumData, txText, 0);
     st('הסיכום מוכן! 🎉', 'ok');
   } catch(e) {
+    hideLoading();
     st('שגיאה: '+e.message, 'err');
-    document.getElementById('out').innerHTML = '<div class="card"><div style="color:#ff4757">שגיאה: '+e.message+'</div></div>';
   }
 }
 
-async function processAudio(blob, screenshots) {
-  showLoad('📝 מתמלל...');
+// ─── Recording ─────────────────────────────────────────────────
+function toggleRec() {
+  if (rec) stopRec(); else startRec();
+}
+
+async function startRec() {
   try {
-    var fd = new FormData();
-    fd.append('file', blob, 'rec.webm');
-    var r = await fetch(BASE+'/transcribe', {method:'POST', body:fd});
-    if (!r.ok) throw new Error(await r.text());
-    var d = await r.json();
-    txText = d.text || '';
-    showLoad('🧠 מסכם...');
-    var sr = await fetch(BASE+'/summarize', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({transcript:txText, screen_text:'', segments:d.segments||[], shots_meta:[]})});
-    if (!sr.ok) throw new Error(await sr.text());
-    sumData = await sr.json();
-    showSummary(sumData, txText, 0);
-    st('הסיכום מוכן! 🎉', 'ok');
-    resetBtn();
+    var audioStream;
+    if (mode === 'class') {
+      audioStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});
+      document.getElementById('statAudioLbl').textContent = 'מיקרופון';
+    } else {
+      var stream = await navigator.mediaDevices.getDisplayMedia({video:{frameRate:1,width:1280,height:720},audio:{echoCancellation:false,noiseSuppression:false}});
+      var aTracks = stream.getAudioTracks();
+      var vTracks = stream.getVideoTracks();
+      if (!aTracks.length) {
+        stream.getTracks().forEach(function(t){t.stop();});
+        st('לא נמצא סאונד — סמן "Share audio" בחלון השיתוף', 'err');
+        return;
+      }
+      audioStream = new MediaStream(aTracks);
+      document.getElementById('statAudioLbl').textContent = mode==='live'?'סאונד זום':'סאונד';
+      if (vTracks.length) {
+        videoEl = document.createElement('video');
+        videoEl.srcObject = new MediaStream(vTracks);
+        videoEl.play();
+        videoEl.onloadedmetadata = function(){
+          shots = [];
+          shotInt = setInterval(function(){ doSnap(videoEl,'fallback'); }, 60000);
+          setTimeout(function(){ doSnap(videoEl,'start'); }, 2000);
+          setStatActive('statScreen', true);
+        };
+        vTracks[0].onended = function(){ if(rec) stopRec(); };
+        startTriggerDetect(audioStream);
+      }
+    }
+
+    var mime = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'].find(function(t){return MediaRecorder.isTypeSupported(t);})||'';
+    mr = new MediaRecorder(audioStream, mime?{mimeType:mime}:{});
+    chunks = []; secs = 0;
+    mr.ondataavailable = function(e){ if(e.data.size>0) chunks.push(e.data); };
+    mr.start(1000);
+    setStatActive('statAudio', true);
+    startViz(audioStream);
+
+    rec = true;
+    setStep(1);
+    document.getElementById('ctaBtn').className = 'cta-btn visible recording';
+    document.getElementById('ctaBtn').textContent = '⏹  עצור שיעור';
+    document.getElementById('timer').className = 'timer-display visible';
+    document.getElementById('waveform').className = 'waveform visible';
+    st('מקליט... לחץ "עצור שיעור" בסיום', 'ok');
+
+    timerInt = setInterval(function(){
+      secs++;
+      var m = String(Math.floor(secs/60)).padStart(2,'0');
+      var s = String(secs%60).padStart(2,'0');
+      document.getElementById('timer').textContent = m+':'+s;
+    },1000);
+
   } catch(e) {
-    st('שגיאה: '+e.message, 'err');
-    resetBtn();
+    st(e.name==='NotAllowedError'?'ביטלת את השיתוף — נסה שוב':'שגיאה: '+e.message, 'err');
   }
 }
 
-function showSummary(data, transcript, shotCount) {
-  var html = '<div class="card"><div style="font-size:20px;font-weight:900;margin-bottom:6px;">'+(data.title||'סיכום השיעור')+'</div>';
-  html += '<div style="font-size:11px;color:#55556a;margin-bottom:10px;">⏱ '+Math.floor(secs/60)+' דקות</div>';
-  html += '<div>'+(data.topics||[]).map(function(t){return'<span class="chip">'+t+'</span>';}).join('')+'</div></div>';
+function doSnap(ve, reason) {
+  if (!rec||!ve) return;
+  var c = document.createElement('canvas');
+  c.width=1280; c.height=720;
+  c.getContext('2d').drawImage(ve,0,0,1280,720);
+  var ts = Math.floor(secs);
+  shots.push({dataUrl:c.toDataURL('image/jpeg',0.65),timestamp:ts,reason:reason||'manual'});
+  setStatActive('statShots', true);
+  document.getElementById('statShotsLbl').textContent = shots.length+' צילומים';
+  if (reason && reason!=='fallback' && reason!=='start') {
+    st('📸 זוהה: "'+reason+'"', 'ok');
+    setTimeout(function(){st('מקליט...','ok');},2500);
+  }
+}
 
-  (data.sections||[]).forEach(function(sec) {
+function startTriggerDetect(audioStream) {
+  var tMR;
+  try { tMR = new MediaRecorder(audioStream, {mimeType:['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(function(t){return MediaRecorder.isTypeSupported(t);})||''}); }
+  catch(e){ return; }
+  tMR.ondataavailable = function(e){ if(e.data.size>0) audioBuffer.push(e.data); };
+  tMR.start(1000);
+  triggerInt = setInterval(async function(){
+    if (!rec||audioBuffer.length===0) return;
+    var blob = new Blob(audioBuffer.slice(-8),{type:'audio/webm'});
+    audioBuffer = audioBuffer.slice(-3);
+    if (blob.size<2000) return;
+    try {
+      var fd = new FormData();
+      fd.append('file',blob,'chunk.webm');
+      var r = await fetch(BASE+'/transcribe',{method:'POST',body:fd});
+      if (!r.ok) return;
+      var txt = ((await r.json()).text||'').toLowerCase();
+      for(var i=0;i<TRIGGERS.length;i++){
+        if(txt.indexOf(TRIGGERS[i])>=0){
+          var now=Date.now();
+          if(now-lastTrigger>3000 && videoEl && rec){
+            lastTrigger=now;
+            doSnap(videoEl,TRIGGERS[i]);
+          }
+          break;
+        }
+      }
+    }catch(e){}
+  },8000);
+}
+
+async function stopRec() {
+  clearInterval(timerInt); clearInterval(shotInt);
+  if(triggerInt){clearInterval(triggerInt);triggerInt=null;}
+  audioBuffer=[]; rec=false; stopViz();
+  document.getElementById('ctaBtn').className='cta-btn visible loading';
+  document.getElementById('ctaBtn').textContent='⏳  מעבד...';
+  document.getElementById('timer').className='timer-display';
+  document.getElementById('waveform').className='waveform';
+  setStatActive('statAudio',false); setStatActive('statScreen',false);
+
+  if(mr&&mr.state!=='inactive'){mr.stop();await new Promise(function(r){mr.onstop=r;});}
+
+  var blob = new Blob(chunks,{type:'audio/webm'});
+  if(blob.size<8000){st('ההקלטה קצרה מדי — נסה לפחות דקתיים','err');resetBtn();return;}
+  await processRec(blob,shots);
+}
+
+async function processRec(blob, screenshots) {
+  var transcript='', screenText='';
+  setStep(2); showLoading('📝 מתמלל אודיו...','');
+  try{
+    var fd=new FormData(); fd.append('file',blob,'rec.webm');
+    var r=await fetch(BASE+'/transcribe',{method:'POST',body:fd});
+    if(!r.ok) throw new Error(await r.text());
+    var wd=await r.json(); transcript=wd.text||''; segments=wd.segments||[]; txText=transcript;
+  }catch(e){hideLoading();st('שגיאה בתמלול: '+e.message,'err');resetBtn();return;}
+
+  if(screenshots.length>0){
+    setStep(3); showLoading('👁 מנתח '+screenshots.length+' צילומים...','');
+    try{
+      var imgs=screenshots.slice(-6).map(function(s){return typeof s==='object'?s.dataUrl:s;});
+      var or=await fetch(BASE+'/ocr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({images:imgs})});
+      if(or.ok) screenText=(await or.json()).text||'';
+    }catch(e){console.warn('OCR:',e);}
+  }
+
+  setStep(4); showLoading('🧠 מסכם ומצליב...','');
+  var shotsMeta=screenshots.map(function(s){return{timestamp:s.timestamp||0,reason:s.reason||''};});
+  try{
+    var sr=await fetch(BASE+'/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:transcript,screen_text:screenText,segments:segments,shots_meta:shotsMeta})});
+    if(!sr.ok) throw new Error(await sr.text());
+    sumData=await sr.json();
+    hideLoading(); setStep(5);
+    renderSummary(sumData,transcript,screenshots.length);
+    st('הסיכום מוכן! 🎉','ok'); resetBtn();
+  }catch(e){hideLoading();st('שגיאה: '+e.message,'err');resetBtn();}
+}
+
+// ─── Render summary ────────────────────────────────────────────
+function renderSummary(data, transcript, shotCount) {
+  var html = '<div class="sum-hero">';
+  html += '<div class="sum-title-text">'+(data.title||'סיכום השיעור')+'</div>';
+  html += '<div class="sum-meta-row"><span>⏱ '+Math.floor(secs/60)+' דקות</span><span>📸 '+shotCount+' צילומים</span></div>';
+  html += '<div class="sum-topics">'+((data.topics||[]).map(function(t){return'<span class="topic-tag">'+t+'</span>';}).join(''))+'</div>';
+  html += '</div>';
+
+  (data.sections||[]).forEach(function(sec){
     if (sec.type==='explanation') {
-      html += '<div class="card"><div class="sec-title" style="color:#00d97e">📖 '+sec.title+'</div><div class="result">'+(sec.content||'').replace(/\n/g,'<br>')+'</div></div>';
+      html += '<div class="output-card">';
+      html += '<div class="card-section-title" style="color:var(--indigo-bright)">📖 '+sec.title+'</div>';
+      html += '<div class="card-body">'+(sec.content||'').replace(/\n/g,'<br>')+'</div>';
+      html += '</div>';
     } else if (sec.type==='formula') {
-      var fh = (sec.formulas||[]).map(function(f){
-        return '<div class="formula-box"><div style="font-size:11px;font-weight:700;color:#7c6af7;margin-bottom:6px;">'+f.name+'</div><div class="formula-latex">'+f.latex+'</div><div style="font-size:12px;color:#55556a;margin-top:6px;">💡 '+f.meaning+'</div></div>';
-      }).join('');
-      html += '<div class="card"><div class="sec-title" style="color:#7c6af7">📐 '+sec.title+'</div>'+fh+'</div>';
+      html += '<div class="output-card">';
+      html += '<div class="card-section-title" style="color:var(--indigo-bright)">📐 '+sec.title+'</div>';
+      (sec.formulas||[]).forEach(function(f){
+        var srcCls = f.source==='screen'?'src-screen':f.source==='both'?'src-both':'src-voice';
+        var srcLbl = f.source==='screen'?'📺 מסך':f.source==='both'?'📺🎙 שניהם':'🎙 הסבר';
+        html += '<div class="formula-block">';
+        html += '<div class="formula-header"><div class="formula-title">'+f.name+'</div><div class="formula-src-badge '+srcCls+'">'+srcLbl+'</div></div>';
+        html += '<div class="formula-latex">'+f.latex+'</div>';
+        html += '<div class="formula-meaning">💡 '+f.meaning+'</div>';
+        html += '</div>';
+      });
+      html += '</div>';
     } else if (sec.type==='exercise') {
-      var sh = (sec.steps||[]).map(function(s,i){return '<div class="ex-step"><div class="ex-num">'+(i+1)+'</div><div><div style="font-size:13px;color:#9090aa;">'+s.desc+'</div>'+(s.formula?'<div style="font-size:13px;color:#f0f0f5;background:#1a1a24;border-radius:5px;padding:5px 10px;margin-top:4px;direction:ltr;text-align:center;">'+s.formula+'</div>':'')+'</div></div>';}).join('');
-      html += '<div class="card"><div class="sec-title" style="color:#ffa726">✏️ '+sec.title+'</div><div style="background:#1a1a24;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;color:#9090aa;">❓ '+(sec.problem||'')+'</div>'+sh+(sec.answer?'<div style="background:rgba(0,217,126,0.1);border:1px solid rgba(0,217,126,0.25);border-radius:8px;padding:12px;font-size:13px;font-weight:600;color:#00d97e;margin-top:10px;">✅ '+sec.answer+'</div>':'')+'</div>';
+      html += '<div class="output-card">';
+      html += '<div class="card-section-title" style="color:var(--amber)">✏️ '+sec.title+'</div>';
+      html += '<div class="exercise-problem">❓ '+(sec.problem||'')+'</div>';
+      (sec.steps||[]).forEach(function(s,i){
+        html += '<div class="step-row"><div class="step-num">'+(i+1)+'</div><div><div class="step-desc">'+s.desc+'</div>';
+        if(s.formula) html += '<div class="step-formula">'+s.formula+'</div>';
+        html += '</div></div>';
+      });
+      if(sec.answer) html += '<div class="step-answer">✅ '+sec.answer+'</div>';
+      html += '</div>';
     } else if (sec.type==='highlight') {
-      html += '<div class="card" style="background:rgba(255,167,38,0.05);border-color:rgba(255,167,38,0.15);"><div class="sec-title" style="color:#ffa726">🎯 '+sec.title+'</div>'+((sec.points||[]).map(function(p){return'<div style="font-size:13px;color:#9090aa;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);">⭐ '+p+'</div>';}).join(''))+'</div>';
+      html += '<div class="output-card">';
+      html += '<div class="card-section-title" style="color:var(--amber)">🎯 '+sec.title+'</div>';
+      html += '<div class="highlight-box">';
+      (sec.points||[]).forEach(function(p){
+        html += '<div class="highlight-point"><span class="highlight-star">⭐</span><span>'+p+'</span></div>';
+      });
+      html += '</div></div>';
     }
   });
 
-  if (transcript) {
-    html += '<div class="card"><div class="sec-title" style="color:#55556a;">תמלול מלא</div><div style="font-size:13px;color:#9090aa;line-height:1.8;max-height:140px;overflow-y:auto;">'+transcript+'</div></div>';
+  if(transcript){
+    html += '<div class="output-card">';
+    html += '<div class="card-section-title">תמלול מלא</div>';
+    html += '<div class="transcript-box">'+transcript+'</div>';
+    html += '</div>';
   }
 
-  html += '<div class="card"><div class="act-row"><button class="act-btn act-g" id="btnPDF">📄 סיכום PDF</button><button class="act-btn act-p" id="btnEx">📝 דף תרגילים</button></div></div>';
+  html += '<div class="output-card">';
+  html += '<div class="card-section-title">יצוא</div>';
+  html += '<div class="actions-row">';
+  html += '<button class="action-btn action-indigo" id="btnSummaryPDF">📄 סיכום PDF</button>';
+  html += '<button class="action-btn action-green" id="btnExercisePDF">📝 דף תרגילים</button>';
+  html += '</div></div>';
 
-  document.getElementById('out').innerHTML = html;
-  document.getElementById('btnPDF').onclick = function(){ exportPDF('summary'); };
-  document.getElementById('btnEx').onclick = function(){ exportPDF('exercises'); };
+  var out = document.getElementById('output');
+  out.innerHTML = html;
 
-  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([document.getElementById('out')]);
+  document.getElementById('btnSummaryPDF').onclick = function(){ exportPDF('summary'); };
+  document.getElementById('btnExercisePDF').onclick = function(){ exportPDF('exercises'); };
+
+  if(window.MathJax&&MathJax.typesetPromise) MathJax.typesetPromise([out]);
 }
 
+// ─── PDF export ────────────────────────────────────────────────
 function exportPDF(m) {
-  if (!sumData) return;
-  var w = window.open('', '_blank');
-  var title = sumData.title || 'סיכום';
+  if(!sumData) return;
+  var w = window.open('','_blank');
+  var title = sumData.title||'סיכום';
+  var topics = (sumData.topics||[]).map(function(t){return '<span style="background:#ede8ff;color:#5a4dcc;font-size:12px;padding:3px 12px;border-radius:20px;display:inline-block;margin:2px">'+t+'</span>';}).join('');
   var body = '';
-  if (m === 'summary') {
+
+  if(m==='summary'){
     (sumData.sections||[]).forEach(function(sec){
-      if (sec.type==='explanation') body += '<h2>📖 '+sec.title+'</h2><p>'+(sec.content||'').replace(/\n/g,'<br>')+'</p>';
-      else if (sec.type==='formula') body += '<h2>📐 '+sec.title+'</h2>'+((sec.formulas||[]).map(function(f){return '<div style="background:#f8f7ff;border:1px solid #e0ddff;border-radius:8px;padding:12px;margin:8px 0"><b style="color:#7c6af7">'+f.name+'</b><div style="text-align:center;font-size:15px;padding:8px;direction:ltr">'+f.latex+'</div><div style="color:#666;font-size:12px">💡 '+f.meaning+'</div></div>';}).join(''));
-      else if (sec.type==='exercise') body += '<h2>✏️ '+sec.title+'</h2><div style="background:#fffbf0;border:1px solid #ffe0a0;border-radius:8px;padding:12px"><p>❓ '+(sec.problem||'')+'</p>'+((sec.steps||[]).map(function(s,i){return '<p>'+(i+1)+'. '+s.desc+(s.formula?' — <code>'+s.formula+'</code>':'')+'</p>';}).join(''))+(sec.answer?'<p style="color:#007a47;font-weight:bold">✅ '+sec.answer+'</p>':'')+'</div>';
-      else if (sec.type==='highlight') body += '<h2>🎯 '+sec.title+'</h2>'+((sec.points||[]).map(function(p){return '<p>⭐ '+p+'</p>';}).join(''));
+      if(sec.type==='explanation'){
+        body += '<h2 style="color:#4338ca;border-bottom:2px solid #6366f1;padding-bottom:6px;margin:1.5rem 0 0.75rem">📖 '+sec.title+'</h2>';
+        body += '<p style="color:#374151;line-height:1.9;font-size:14px">'+(sec.content||'').replace(/\n/g,'<br>')+'</p>';
+      } else if(sec.type==='formula'){
+        body += '<h2 style="color:#4338ca;border-bottom:2px solid #6366f1;padding-bottom:6px;margin:1.5rem 0 0.75rem">📐 '+sec.title+'</h2>';
+        (sec.formulas||[]).forEach(function(f){
+          body += '<div style="background:#f8f7ff;border:1px solid #e0ddff;border-right:4px solid #6366f1;border-radius:8px;padding:14px;margin-bottom:10px">';
+          body += '<div style="font-size:11px;font-weight:700;color:#6366f1;text-transform:uppercase;margin-bottom:8px">'+f.name+'</div>';
+          body += '<div style="text-align:center;font-size:16px;padding:10px 0;direction:ltr">'+f.latex+'</div>';
+          body += '<div style="font-size:12px;color:#6b7280;border-top:1px solid #e0ddff;padding-top:8px;margin-top:4px">💡 '+f.meaning+'</div>';
+          body += '</div>';
+        });
+      } else if(sec.type==='exercise'){
+        body += '<h2 style="color:#b45309;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin:1.5rem 0 0.75rem">✏️ '+sec.title+'</h2>';
+        body += '<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:14px">';
+        body += '<p style="font-size:14px;color:#374151;margin-bottom:12px">❓ '+(sec.problem||'')+'</p>';
+        (sec.steps||[]).forEach(function(s,i){
+          body += '<div style="display:flex;gap:10px;margin-bottom:10px">';
+          body += '<div style="width:26px;height:26px;min-width:26px;background:#10b981;color:white;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">'+(i+1)+'</div>';
+          body += '<div><p style="font-size:13px;color:#374151;margin:0">'+s.desc+'</p>';
+          if(s.formula) body += '<div style="background:#f5f5f5;border-radius:5px;padding:5px 10px;direction:ltr;text-align:center;margin-top:5px">'+s.formula+'</div>';
+          body += '</div></div>';
+        });
+        if(sec.answer) body += '<div style="background:#d1fae5;border:1px solid #10b981;border-radius:6px;padding:10px;font-size:14px;font-weight:600;color:#065f46;margin-top:10px">✅ '+sec.answer+'</div>';
+        body += '</div>';
+      } else if(sec.type==='highlight'){
+        body += '<h2 style="color:#b45309;border-bottom:2px solid #f59e0b;padding-bottom:6px;margin:1.5rem 0 0.75rem">🎯 '+sec.title+'</h2>';
+        body += '<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:14px">';
+        (sec.points||[]).forEach(function(p){
+          body += '<p style="font-size:14px;color:#374151;padding:6px 0;border-bottom:1px solid #fde68a;margin:0">⭐ '+p+'</p>';
+        });
+        body += '</div>';
+      }
     });
   } else {
+    body += '<p style="color:#6b7280;font-size:13px;margin-bottom:1.5rem">תרגל את החומר שנלמד בשיעור</p>';
     (sumData.exercises||[]).forEach(function(ex,i){
-      body += '<div style="border:1.5px solid #e0e0f0;border-radius:8px;padding:1rem;margin:1rem 0"><b>שאלה '+(i+1)+'</b><p>'+ex.question+'</p>'+(ex.hint?'<p style="color:#888;font-style:italic">💡 '+ex.hint+'</p>':'')+'<div style="border-top:1px dashed #ddd;margin-top:12px;padding-top:12px;height:80px;"></div></div>';
+      body += '<div style="border:1.5px solid #e0e0f0;border-right:4px solid #6366f1;border-radius:8px;padding:1.25rem;margin-bottom:1.25rem">';
+      body += '<span style="background:#6366f1;color:white;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600">שאלה '+(i+1)+'</span>';
+      body += '<p style="font-size:15px;color:#1a1a2e;margin:12px 0">'+ex.question+'</p>';
+      if(ex.hint) body += '<p style="font-size:12px;color:#9ca3af;font-style:italic">💡 רמז: '+ex.hint+'</p>';
+      body += '<div style="margin-top:14px;border-top:1px dashed #d1d5db;padding-top:12px">';
+      body += '<div style="display:flex;flex-direction:column;gap:18px">';
+      body += '<div style="height:1px;background:#f3f4f6"></div><div style="height:1px;background:#f3f4f6"></div><div style="height:1px;background:#f3f4f6"></div><div style="height:1px;background:#f3f4f6"></div>';
+      body += '</div></div></div>';
     });
   }
-  w.document.write('<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>'+title+'</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:2rem;direction:rtl;}h2{color:#333;margin:1.5rem 0 0.5rem;}</style></head><body><h1>'+title+'</h1>'+body+'<script>window.onload=function(){window.print();}<\/script></body></html>');
+
+  w.document.write([
+    '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">',
+    '<title>'+title+'</title>',
+    '<script>window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]]}}<\/script>',
+    '<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"><\/script>',
+    '<style>',
+    'body{font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:3rem;direction:rtl;color:#1a1a2e;print-color-adjust:exact;-webkit-print-color-adjust:exact}',
+    '@media print{body{padding:2rem}}',
+    '</style></head><body>',
+    '<div style="text-align:center;background:linear-gradient(135deg,#020208,#111125);color:white;padding:2.5rem;border-radius:12px;margin-bottom:2.5rem">',
+    '<p style="color:#818cf8;font-weight:700;letter-spacing:3px;font-size:11px;text-transform:uppercase;margin-bottom:0.75rem">AcademicRescue AI</p>',
+    '<h1 style="font-size:28px;font-weight:800;margin-bottom:10px">'+title+(m==='exercises'?' — דף תרגילים':'')+'</h1>',
+    '<div style="margin-top:12px">'+topics+'</div>',
+    '</div>',
+    body,
+    '<script>window.onload=function(){if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise().then(function(){window.print();});else setTimeout(function(){window.print();},1500);}<\/script>',
+    '</body></html>'
+  ].join(''));
   w.document.close();
 }
 
-function showLoad(msg) {
-  document.getElementById('out').innerHTML = '<div class="card" style="text-align:center;padding:3rem;color:#55556a;"><div style="font-size:32px;margin-bottom:1rem;">'+msg.split(' ')[0]+'</div><div>'+msg+'</div></div>';
+// ─── Visualizer ────────────────────────────────────────────────
+function startViz(stream){
+  try{
+    actx=new AudioContext(); anlz=actx.createAnalyser(); anlz.fftSize=256;
+    actx.createMediaStreamSource(stream).connect(anlz);
+    animWave();
+  }catch(e){}
 }
-function st(msg,type){ var e=document.getElementById('status'); e.textContent=msg; e.className='status'+(type?' '+type:''); }
-function resetBtn(){ var b=document.getElementById('recBtn'); b.className='btn show'; b.textContent='🎬 התחל שיעור'; }
+function animWave(){
+  if(!anlz) return;
+  var d=new Uint8Array(anlz.frequencyBinCount); anlz.getByteFrequencyData(d);
+  for(var i=0;i<12;i++){
+    var b=document.getElementById('w'+i); if(!b) continue;
+    var v=d[Math.floor(i*d.length/12)];
+    b.style.height=Math.max(2,Math.min(32,(v/255)*32))+'px';
+    b.style.opacity=Math.max(0.2,v/255);
+  }
+  af=requestAnimationFrame(animWave);
+}
+function stopViz(){
+  if(af){cancelAnimationFrame(af);af=null;}
+  if(actx){actx.close();actx=null;anlz=null;}
+  for(var i=0;i<12;i++){var b=document.getElementById('w'+i);if(b){b.style.height='2px';b.style.opacity='0.2';}}
+}
+
+// ─── Helpers ───────────────────────────────────────────────────
+function st(msg,type){var e=document.getElementById('statusLine');e.textContent=msg;e.className='status-line'+(type?' '+type:'');}
+function resetBtn(){var b=document.getElementById('ctaBtn');b.className='cta-btn visible idle';b.textContent='🎬  התחל שיעור';}
+function setStatActive(id,on){document.getElementById(id).className='stat-pill'+(on?' active':'');}
+function setStep(n){for(var i=1;i<=5;i++){var e=document.getElementById('ps'+i);e.className='pstep'+(i<n?' done':i===n?' active':'');}}
+function showLoading(title,sub){
+  document.getElementById('loadingTitle').textContent=title;
+  document.getElementById('loadingSub').textContent=sub;
+  document.getElementById('loadingOverlay').className='loading-overlay visible';
+}
+function hideLoading(){document.getElementById('loadingOverlay').className='loading-overlay';}
+
+// ─── PWA ───────────────────────────────────────────────────────
+var _dp=null;
+var _ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+var _standalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+
+if(!_standalone){
+  if(_ios){
+    setTimeout(function(){
+      var b=document.getElementById('install-banner');
+      b.style.display='block';
+      document.getElementById('install-ios-steps').style.display='block';
+    },5000);
+  }
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault(); _dp=e;
+    var b=document.getElementById('install-banner');
+    b.style.display='block';
+    document.getElementById('install-chrome-wrap').style.display='block';
+  });
+}
+
+function doInstall(){
+  if(!_dp) return;
+  _dp.prompt();
+  _dp.userChoice.then(function(){_dp=null;document.getElementById('install-banner').style.display='none';});
+}
+
+window.addEventListener('appinstalled',function(){document.getElementById('install-banner').style.display='none';});
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/static/sw.js').catch(function(){});
+}
 </script>
 </body>
 </html>
