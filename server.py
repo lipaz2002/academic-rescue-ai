@@ -224,3 +224,57 @@ async def ocr(req: Request):
         pass
 
     return {"text": ""}
+
+# ─── Chat (Ask the summary) ─────────────────────────────────────
+@app.post("/chat")
+async def chat(req: Request):
+    if not OPENAI_KEY:
+        raise HTTPException(500, "API Key לא מוגדר")
+
+    check_rate(get_ip(req))
+
+    try:
+        body = await req.json()
+    except Exception:
+        raise HTTPException(400, "JSON לא תקין")
+
+    messages = body.get("messages", [])
+    summary = body.get("summary", {})
+    transcript = str(body.get("transcript", ""))[:3000]
+
+    if not messages or not isinstance(messages, list):
+        raise HTTPException(400, "חסרות הודעות")
+
+    clean_messages = []
+    for m in messages[-20:]:
+        if isinstance(m, dict) and m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str):
+            clean_messages.append({"role": m["role"], "content": str(m["content"])[:2000]})
+
+    if not clean_messages:
+        raise HTTPException(400, "הודעות לא תקינות")
+
+    system_prompt = f"""אתה עוזר חכם לסטודנטים. עונה רק על בסיס הסיכום והתמלול שניתן לך.
+סיכום: {json.dumps(summary, ensure_ascii=False)[:4000]}
+תמלול: {transcript}
+כללים: ענה בעברית פשוטה. אם השאלה לא קשורה — אמור שאתה עונה רק על חומר השיעור. היה ידידותי. עד 150 מילה."""
+
+    try:
+        async with httpx.AsyncClient(timeout=60) as client:
+            r = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"},
+                json={"model": "gpt-4o", "max_tokens": 600,
+                      "messages": [{"role": "system", "content": system_prompt}] + clean_messages}
+            )
+    except httpx.TimeoutException:
+        raise HTTPException(504, "פסק זמן. נסה שוב.")
+    except Exception as e:
+        raise HTTPException(502, f"שגיאת חיבור: {str(e)[:80]}")
+
+    if r.status_code == 429:
+        raise HTTPException(429, "יותר מדי בקשות. נסה שוב.")
+    if r.status_code != 200:
+        raise HTTPException(r.status_code, f"שגיאה: {r.text[:150]}")
+
+    answer = r.json()["choices"][0]["message"]["content"]
+    return {"answer": answer}
