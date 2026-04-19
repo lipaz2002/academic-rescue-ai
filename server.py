@@ -152,14 +152,21 @@ async def summarize(req: Request):
     if screen_text:
         ctx += f"\n\n=== מסך ===\n{screen_text}"
 
-    system = """אתה מומחה לסיכום שיעורים אקדמיים לסטודנטים ישראלים.
-כללים: נוסחאות בLaTeX ($...$ ו$$...$$), תרגילים שלב-שלב, עברית פשוטה.
-החזר JSON בלבד:
+    system = """אתה מומחה לסיכום שיעורים אקדמיים לסטודנטים ישראלים. החזר JSON בלבד, ללא טקסט נוסף.
+
+⚠️ כללי פורמט קריטיים — חובה לציית לחלוטין:
+• שדה "latex" (בנוסחאות): LaTeX טהור בלבד, אסור $$ או $ — לדוגמה: \\int_a^b f(x)\\,dx
+• שדה "formula" (בצעדי תרגיל): LaTeX טהור בלבד, אסור $$ או $ — לדוגמה: \\Delta x = \\frac{b-a}{n}
+• שדה "meaning": עברית פשוטה בלבד, אסור $ בכלל, אסור LaTeX
+• שדה "desc": עברית פשוטה בלבד, אסור $ בכלל, אסור LaTeX
+• שדות content/title/problem/answer/points/hint/question: עברית פשוטה בלבד
+
+מבנה JSON:
 {"title":"נושא","topics":["נושא"],"sections":[
-{"type":"explanation","title":"כותרת","content":"טקסט"},
-{"type":"formula","title":"נוסחאות","formulas":[{"name":"שם","latex":"$$...$$","meaning":"הסבר","source":"voice"}]},
-{"type":"exercise","title":"תרגיל","problem":"שאלה","steps":[{"step":1,"desc":"מה","formula":""}],"answer":"תשובה"},
-{"type":"highlight","title":"חשוב למבחן","points":["נקודה"]}
+{"type":"explanation","title":"כותרת","content":"טקסט עברי פשוט"},
+{"type":"formula","title":"נוסחאות","formulas":[{"name":"שם הנוסחה","latex":"\\\\frac{d}{dx}f(x)=f'(x)","meaning":"הסבר בעברית ללא סימנים","source":"voice"}]},
+{"type":"exercise","title":"תרגיל","problem":"שאלה בעברית בלבד","steps":[{"step":1,"desc":"הסבר בעברית בלבד","formula":"\\\\Delta x = \\\\frac{b-a}{n}"}],"answer":"תשובה בעברית"},
+{"type":"highlight","title":"חשוב למבחן","points":["נקודה בעברית"]}
 ],"exercises":[{"question":"שאלה","hint":"רמז"}]}"""
 
     try:
