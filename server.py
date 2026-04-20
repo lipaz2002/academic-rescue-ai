@@ -234,13 +234,15 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
 
 כעת צור סיכום מלא לשיעור שקיבלת, בדיוק באותו מבנה. השתמש בניתוח הפרופסור המומחה כדי להעשיר כל סקציית concept עם ai_enrichment, deeper_insight ו-analogy מעולים."""
 
-SUMMARIZE_FALLBACK_SYSTEM = """אתה מומחה לסיכום שיעורים. החזר JSON בלבד.
-כללים: LaTeX טהור בשדות latex/formula בלבד (אסור $ או $$). עברית פשוטה בכל שאר השדות.
+SUMMARIZE_FALLBACK_SYSTEM = """אתה מומחה לסיכום שיעורים. החזר JSON בלבד, ללא טקסט נוסף.
+כללים: LaTeX טהור בשדות latex בלבד (אסור $ או $$). עברית פשוטה בכל שאר השדות.
+FORBIDDEN section types: "explanation", "highlight" — אסור לחלוטין.
+השתמש ONLY ב: big_picture, concept, formula, exercise, mental_model, missed_by_lecturer, exam_traps.
 מבנה: {"title":"נושא","topics":["נושא"],"enriched":false,"sections":[
-{"type":"explanation","title":"כותרת","content":"הסבר"},
-{"type":"formula","title":"נוסחאות","formulas":[{"name":"שם","latex":"\\\\frac{a}{b}","meaning":"הסבר","source":"voice"}]},
-{"type":"exercise","title":"תרגיל","problem":"שאלה","steps":[{"step":1,"desc":"הסבר","formula":""}],"answer":"תשובה"},
-{"type":"highlight","title":"חשוב למבחן","points":["נקודה"]}
+{"type":"big_picture","content":"תמונה כללית של הנושא"},
+{"type":"concept","title":"מושג","intuition":"הסבר אינטואיטיבי","formal_definition":"הגדרה פורמלית","concrete_example":"דוגמה קונקרטית","common_mistakes":["טעות נפוצה"]},
+{"type":"formula","title":"נוסחה","latex":"\\\\frac{a}{b}","what_it_calculates":"מה הנוסחה מחשבת"},
+{"type":"exercise","title":"תרגיל","problem":"שאלה","steps":[{"explanation":"הסבר השלב","latex":"נוסחה"}],"conclusion":"מסקנה"}
 ],"formulas_tab":[],"exercises_tab":[],"key_points_tab":[]}"""
 
 
