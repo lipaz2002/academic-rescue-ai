@@ -141,97 +141,72 @@ ENRICH_SYSTEM = """אתה פרופסור בכיר עם ידע אנציקלופד
   "exam_traps": ["מלכודות מבחן נפוצות בנושא זה"]
 }"""
 
-SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבלת:
-1. תמלול שיעור אקדמי
-2. ניתוח מועשר של פרופסור מומחה
+SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבלת תמלול שיעור ונתוח מועשר של פרופסור מומחה.
+צור סיכום עמוק ועשיר שהוא פי 1000 טוב מהשיעור עצמו.
+החזר JSON בלבד, ללא טקסט נוסף, ללא ```json.
 
-צור סיכום שהוא פי 1000 טוב מכל מה שהמורה הסביר.
-החזר JSON בלבד, ללא טקסט נוסף.
+🚨 CRITICAL — סוגי סקציות מותרים בלבד:
+• FORBIDDEN (אסור לחלוטין): "explanation", "highlight"
+• ALLOWED ONLY (מותר בלבד): "big_picture", "concept", "formula", "exercise", "mental_model", "missed_by_lecturer", "exam_traps"
+• כל מושג מהשיעור חייב להופיע כסקציית "concept" עם כל השדות מלאים בפירוט מרבי.
+• NEVER output a section with type "explanation" or "highlight" — this will break the app.
 
 ⚠️ כללי LaTeX — חובה:
 • שדות "latex" ו-"formula": LaTeX טהור בלבד — אסור $$ או $ — לדוגמה: \\frac{d}{dx}f(x)
-• לעולם אל תכתוב 0 במכנה — כתוב תמיד את הביטוי המלא
-• שדות טקסטואליים (content/intuition/analogy/meaning/desc/answer/text וכו'): עברית פשוטה בלבד, אסור $ או LaTeX
+• שדות טקסטואליים (content/intuition/analogy/meaning/desc/answer וכו'): עברית פשוטה בלבד, אסור $ או LaTeX
 
-מבנה JSON:
+=== דוגמה לפלט תקין (GOOD OUTPUT — copy this structure exactly) ===
 {
-  "title": "כותרת השיעור",
-  "topics": ["נושאים"],
+  "title": "חשבון דיפרנציאלי — פונקציות רבות משתנים",
+  "topics": ["תחום פונקציה", "נגזרות חלקיות"],
   "enriched": true,
   "sections": [
     {
       "type": "big_picture",
-      "content": "תמונה גדולה: מה הנושא, למה הוא קיים, למה חשוב ללמוד אותו, קשר לעולם האמיתי"
+      "content": "פונקציות רבות משתנים הן הרחבה טבעית של פונקציות רגילות לכמה ממדים. במקום לתאר קו, הן מתארות משטחים ונפחים. הן מרכזיות בפיזיקה, כלכלה ולמידת מכונה."
     },
     {
       "type": "concept",
-      "title": "שם המושג",
-      "intuition": "הסבר אינטואיטיבי ראשון — לפני כל הגדרה פורמלית, בשפה פשוטה",
-      "analogy": "אנלוגיה מהחיים שכל אחד מבין",
-      "formal_definition": "ההגדרה הפורמלית — אחרי שהבנו אינטואיטיבית",
-      "concrete_example": "דוגמה מספרית מלאה עם כל שלב מוסבר",
-      "common_mistakes": ["⚠️ טעות נפוצה"],
-      "deeper_insight": "💡 תובנה שהמורה לא ציין",
-      "ai_enrichment": "💎 ידע נוסף מעבר לשיעור"
+      "title": "תחום פונקציה",
+      "intuition": "התחום הוא כל הנקודות שבהן הפונקציה בכלל מסוגלת לעבוד — איפה שהיא לא מתפוצצת",
+      "analogy": "דמיין מכונת קפה — התחום הוא כל סוגי הכוסות שהמכונה מסוגלת למלא. כוס שבורה תגרום לשגיאה.",
+      "formal_definition": "התחום הוא קבוצת כל הנקודות (x,y) שעבורן הפונקציה f(x,y) מוגדרת",
+      "concrete_example": "עבור f(x,y)=sqrt(x+y): צריך x+y>=0, לכן התחום הוא החצי-מישור מעל הישר y=-x",
+      "common_mistakes": ["לשכוח לבדוק שורש של ביטוי שלילי", "לשכוח חלוקה באפס כשיש מכנה"],
+      "deeper_insight": "בניגוד לפונקציה חד-משתנית שהתחום שלה הוא קטע, כאן התחום הוא בדרך כלל אזור דו-ממדי",
+      "ai_enrichment": "בגאומטריה דיפרנציאלית, התחום מגדיר את הרצפה שעליה הפונקציה חיה — רעיון שמתרחב למנিפולדים"
     },
     {
       "type": "formula",
-      "title": "שם הנוסחה",
-      "latex": "נוסחה בלטקס מדויקת",
-      "what_it_calculates": "מה הנוסחה מחשבת במילים פשוטות",
-      "variables_explained": {"x": "מה זה x", "y": "מה זה y"},
-      "numerical_example": "דוגמה עם מספרים ממשיים, כל שלב מוסבר",
-      "intuition": "למה הנוסחה נראית ככה — ההיגיון מאחוריה"
-    },
-    {
-      "type": "exercise",
-      "title": "כותרת התרגיל",
-      "problem": "שאלה מלאה ומדויקת",
-      "strategy": "אסטרטגיית פתרון — מה נעשה ולמה לפני שמתחילים",
-      "steps": [
-        {
-          "explanation": "מה אנחנו עושים בשלב זה ולמה — משפט מלא",
-          "latex": "הנוסחה המדויקת בלטקס",
-          "result_meaning": "מה התוצאה אומרת לנו"
-        }
-      ],
-      "conclusion": "מסקנה מלאה עם הסבר למה הגענו לזה",
-      "exam_tip": "🎯 איך לענות על שאלה כזו במבחן"
+      "title": "נוסחת הנגזרת החלקית",
+      "latex": "\\frac{\\partial f}{\\partial x} = \\lim_{h \\to 0} \\frac{f(x+h,y)-f(x,y)}{h}",
+      "what_it_calculates": "שיעור השינוי של הפונקציה לכיוון x בלבד, תוך קיבוע y",
+      "variables_explained": {"f": "הפונקציה", "x": "המשתנה שלפיו גוזרים", "h": "הפרש אינפיטסימלי"},
+      "numerical_example": "עבור f(x,y)=x^2+y: הנגזרת לפי x היא 2x, ולפי y היא 1",
+      "intuition": "גוזרים רק לכיוון אחד ומקפיאים את כל השאר — כאילו הפונקציה חד-משתנית רגעית"
     },
     {
       "type": "mental_model",
-      "content": "מודל מנטלי: 4-5 משפטים שהסטודנט יכול לחזור לחבר ברחוב"
+      "content": "חשוב על פונקציה דו-משתנית כעל מפת גובה. כל נקודה (x,y) מקבלת גובה f(x,y). התחום הוא הרצפה שאפשר לדרוך עליה. הנגזרת החלקית היא השיפוע לכיוון מסוים."
     },
     {
       "type": "missed_by_lecturer",
-      "items": ["💎 דבר חשוב שהמורה פספס — עם הסבר מלא"]
+      "items": ["הקשר בין תחום הפונקציה לבין רציפותה — פונקציה יכולה להיות מוגדרת בנקודה אך לא רציפה בה"]
     },
     {
       "type": "exam_traps",
-      "items": ["⚠️ מלכודת מבחן — עם הסבר מה לעשות במקום"]
+      "items": ["לשכוח לבדוק את שני התנאים (שורש ומכנה) בו זמנית", "לכתוב את התחום כקטע 1D במקום כאזור 2D"]
     }
   ],
   "formulas_tab": [
-    {
-      "name": "שם הנוסחה",
-      "latex": "נוסחה בלטקס",
-      "one_line": "הסבר בשורה אחת"
-    }
+    {"name": "נגזרת חלקית לפי x", "latex": "\\frac{\\partial f}{\\partial x}", "one_line": "שיעור השינוי לכיוון x תוך קיבוע y"}
   ],
-  "exercises_tab": [
-    {
-      "title": "שם התרגיל",
-      "problem": "השאלה",
-      "steps": [
-        {"text": "הסבר השלב", "latex": "נוסחה מדויקת"}
-      ],
-      "answer": "תשובה סופית"
-    }
-  ],
-  "key_points_tab": [
-    "🎯 נקודה חשובה — משפט אחד ברור"
-  ]
-}"""
+  "exercises_tab": [],
+  "key_points_tab": ["התחום בשני משתנים הוא אזור 2D, לא קטע", "תמיד לבדוק שורש, מכנה ולוגריתם"]
+}
+=== סוף הדוגמה ===
+
+כעת צור סיכום מלא לשיעור שקיבלת, בדיוק באותו מבנה. השתמש בניתוח הפרופסור המומחה כדי להעשיר כל סקציית concept עם ai_enrichment, deeper_insight ו-analogy מעולים."""
 
 SUMMARIZE_FALLBACK_SYSTEM = """אתה מומחה לסיכום שיעורים. החזר JSON בלבד.
 כללים: LaTeX טהור בשדות latex/formula בלבד (אסור $ או $$). עברית פשוטה בכל שאר השדות.
@@ -244,11 +219,12 @@ SUMMARIZE_FALLBACK_SYSTEM = """אתה מומחה לסיכום שיעורים. ה
 
 
 async def _gpt(client: httpx.AsyncClient, system: str, user: str,
-               model: str = "gpt-4o", max_tokens: int = 1500) -> str:
+               model: str = "gpt-4o", max_tokens: int = 1500,
+               temperature: float = 0.7) -> str:
     r = await client.post(
         "https://api.openai.com/v1/chat/completions",
         headers={"Authorization": f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"},
-        json={"model": model, "max_tokens": max_tokens,
+        json={"model": model, "max_tokens": max_tokens, "temperature": temperature,
               "messages": [{"role": "system", "content": system},
                            {"role": "user", "content": user}]}
     )
@@ -319,14 +295,23 @@ async def summarize(req: Request):
             # ── STAGE 2: Main summary generation ───────────────────
             if enriched:
                 user_msg = (
-                    f"תמלול השיעור:\n{ctx[:20000]}\n\n"
-                    f"ניתוח הפרופסור המומחה:\n{enrichment_json[:8000]}"
+                    f"=== תמלול השיעור ===\n{ctx[:20000]}\n\n"
+                    f"=== ניתוח הפרופסור המומחה (השתמש בזה להעשיר את כל סקציות concept) ===\n"
+                    f"{enrichment_json[:8000]}\n\n"
+                    f"REMINDER: השתמש ONLY בסוגים: big_picture, concept, formula, exercise, "
+                    f"mental_model, missed_by_lecturer, exam_traps. "
+                    f"אסור: explanation, highlight."
                 )
             else:
-                user_msg = f"סכם את השיעור הבא:\n\n{ctx[:28000]}"
+                user_msg = (
+                    f"=== תמלול השיעור ===\n{ctx[:28000]}\n\n"
+                    f"REMINDER: השתמש ONLY בסוגים: big_picture, concept, formula, exercise, "
+                    f"mental_model, missed_by_lecturer, exam_traps. "
+                    f"אסור: explanation, highlight."
+                )
 
             raw_summary = await _gpt(client, SUMMARIZE_SYSTEM, user_msg,
-                                     model="gpt-4o", max_tokens=4500)
+                                     model="gpt-4o", max_tokens=4500, temperature=0.3)
 
         elapsed = round(time.time() - t_start, 1)
 
