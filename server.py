@@ -132,14 +132,39 @@ ENRICH_SYSTEM = """אתה פרופסור בכיר עם ידע אנציקלופד
       "best_analogy": "האנלוגיה הטובה ביותר מהעולם האמיתי",
       "concrete_example": "דוגמה מספרית או קונקרטית מלאה",
       "common_mistakes": ["טעות נפוצה 1", "טעות נפוצה 2"],
-      "deeper_insight": "תובנה עמוקה שהמורה לא ציין"
+      "deeper_insight": "תובנה עמוקה שהמורה לא ציין",
+      "visualization": null
     }
   ],
   "missed_by_lecturer": ["דבר חשוב שהמורה פספס או הסביר בצורה גרועה"],
   "corrections": ["תיקון אם המורה אמר משהו לא מדויק — כתוב בעדינות"],
   "connections_to_other_topics": ["קשר לנושא אחר שעוזר להבנה"],
   "exam_traps": ["מלכודות מבחן נפוצות בנושא זה"]
-}"""
+}
+
+For each concept or formula that benefits from a visual explanation, replace the null "visualization" with one of these objects. Only add when it GENUINELY helps — not for every concept.
+
+TYPE SELECTION RULES:
+- "desmos": ONLY for 2D math functions, curves, regions, inequalities, geometric shapes
+- "svg": for physics diagrams, chemistry, biology, flow charts, abstract concepts
+- "chart": for data comparisons — economics (supply/demand), statistics, time series
+- "animation": for dynamic processes — wave motion, pendulum, electric current
+
+DESMOS FORMAT (expressions must be valid JSON):
+{"type":"desmos","expressions":[{"id":"1","latex":"y=x^2","color":"#7c6dff"},{"id":"2","latex":"y=0","color":"#00d97e","lineStyle":"DASHED"}],"viewport":{"xmin":-5,"xmax":5,"ymin":-3,"ymax":10},"caption":"פרבולה y=x²"}
+
+SVG FORMAT (complete, self-contained, viewBox="0 0 400 280", background #0d0b1e, Hebrew text):
+{"type":"svg","markup":"<svg viewBox=\\"0 0 400 280\\" xmlns=\\"http://www.w3.org/2000/svg\\" style=\\"background:#0d0b1e;border-radius:12px\\">...beautiful SVG with Hebrew labels...</svg>","caption":"תיאור"}
+
+SVG COLOR PALETTE: background #0d0b1e, primary #7c6dff, success #00d97e, warning #f59e0b, danger #ff4060, info #06b6d4, text #e2e8f0, subtle #64748b. Use gradients and shadows. Make it beautiful.
+
+CHART FORMAT:
+{"type":"chart","chartType":"line","labels":["א","ב","ג"],"datasets":[{"label":"היצע","data":[10,20,30],"color":"#7c6dff"}],"xLabel":"כמות","yLabel":"מחיר","caption":"גרף"}
+
+ANIMATION FORMAT (full self-contained HTML with inline CSS animations):
+{"type":"animation","html":"<!DOCTYPE html><html><head><style>body{margin:0;background:#0d0b1e}...CSS...</style></head><body>...content...</body></html>","caption":"הסבר"}
+
+CRITICAL: Validate your JSON mentally before including it. SVG must be complete and valid. Only 1-2 visualizations per lecture maximum."""
 
 SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבלת תמלול שיעור ונתוח מועשר של פרופסור מומחה.
 צור סיכום עמוק ועשיר שהוא פי 1000 טוב מהשיעור עצמו.
@@ -150,6 +175,7 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
 • ALLOWED ONLY (מותר בלבד): "big_picture", "concept", "formula", "exercise", "mental_model", "missed_by_lecturer", "exam_traps"
 • כל מושג מהשיעור חייב להופיע כסקציית "concept" עם כל השדות מלאים בפירוט מרבי.
 • NEVER output a section with type "explanation" or "highlight" — this will break the app.
+• If the enrichment data contains a "visualization" object for a concept, copy it into the matching concept section as "visualization": {...}.
 
 ⚠️ כללי LaTeX — חובה:
 • שדות "latex" ו-"formula": LaTeX טהור בלבד — אסור $$ או $ — לדוגמה: \\frac{d}{dx}f(x)
