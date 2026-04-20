@@ -118,7 +118,149 @@ async def transcribe(request: Request, file: UploadFile = File(...)):
 
     return r.json()
 
-# ─── Summarize ──────────────────────────────────────────────────
+# ─── Summarize (3-stage AI pipeline) ────────────────────────────
+ENRICH_SYSTEM = """אתה פרופסור בכיר עם ידע אנציקלופדי. קיבלת תמלול שיעור אקדמי.
+עליך לנתח אותו ולהחזיר JSON בלבד עם המפתחות הבאים:
+
+{
+  "topics": ["רשימת נושאים מרכזיים"],
+  "enriched_concepts": [
+    {
+      "concept": "שם המושג",
+      "lecture_explanation": "מה המורה אמר",
+      "better_explanation": "הסבר עמוק יותר שלך עם אינטואיציה",
+      "best_analogy": "האנלוגיה הטובה ביותר מהעולם האמיתי",
+      "concrete_example": "דוגמה מספרית או קונקרטית מלאה",
+      "common_mistakes": ["טעות נפוצה 1", "טעות נפוצה 2"],
+      "deeper_insight": "תובנה עמוקה שהמורה לא ציין"
+    }
+  ],
+  "missed_by_lecturer": ["דבר חשוב שהמורה פספס או הסביר בצורה גרועה"],
+  "corrections": ["תיקון אם המורה אמר משהו לא מדויק — כתוב בעדינות"],
+  "connections_to_other_topics": ["קשר לנושא אחר שעוזר להבנה"],
+  "exam_traps": ["מלכודות מבחן נפוצות בנושא זה"]
+}"""
+
+SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבלת:
+1. תמלול שיעור אקדמי
+2. ניתוח מועשר של פרופסור מומחה
+
+צור סיכום שהוא פי 1000 טוב מכל מה שהמורה הסביר.
+החזר JSON בלבד, ללא טקסט נוסף.
+
+⚠️ כללי LaTeX — חובה:
+• שדות "latex" ו-"formula": LaTeX טהור בלבד — אסור $$ או $ — לדוגמה: \\frac{d}{dx}f(x)
+• לעולם אל תכתוב 0 במכנה — כתוב תמיד את הביטוי המלא
+• שדות טקסטואליים (content/intuition/analogy/meaning/desc/answer/text וכו'): עברית פשוטה בלבד, אסור $ או LaTeX
+
+מבנה JSON:
+{
+  "title": "כותרת השיעור",
+  "topics": ["נושאים"],
+  "enriched": true,
+  "sections": [
+    {
+      "type": "big_picture",
+      "content": "תמונה גדולה: מה הנושא, למה הוא קיים, למה חשוב ללמוד אותו, קשר לעולם האמיתי"
+    },
+    {
+      "type": "concept",
+      "title": "שם המושג",
+      "intuition": "הסבר אינטואיטיבי ראשון — לפני כל הגדרה פורמלית, בשפה פשוטה",
+      "analogy": "אנלוגיה מהחיים שכל אחד מבין",
+      "formal_definition": "ההגדרה הפורמלית — אחרי שהבנו אינטואיטיבית",
+      "concrete_example": "דוגמה מספרית מלאה עם כל שלב מוסבר",
+      "common_mistakes": ["⚠️ טעות נפוצה"],
+      "deeper_insight": "💡 תובנה שהמורה לא ציין",
+      "ai_enrichment": "💎 ידע נוסף מעבר לשיעור"
+    },
+    {
+      "type": "formula",
+      "title": "שם הנוסחה",
+      "latex": "נוסחה בלטקס מדויקת",
+      "what_it_calculates": "מה הנוסחה מחשבת במילים פשוטות",
+      "variables_explained": {"x": "מה זה x", "y": "מה זה y"},
+      "numerical_example": "דוגמה עם מספרים ממשיים, כל שלב מוסבר",
+      "intuition": "למה הנוסחה נראית ככה — ההיגיון מאחוריה"
+    },
+    {
+      "type": "exercise",
+      "title": "כותרת התרגיל",
+      "problem": "שאלה מלאה ומדויקת",
+      "strategy": "אסטרטגיית פתרון — מה נעשה ולמה לפני שמתחילים",
+      "steps": [
+        {
+          "explanation": "מה אנחנו עושים בשלב זה ולמה — משפט מלא",
+          "latex": "הנוסחה המדויקת בלטקס",
+          "result_meaning": "מה התוצאה אומרת לנו"
+        }
+      ],
+      "conclusion": "מסקנה מלאה עם הסבר למה הגענו לזה",
+      "exam_tip": "🎯 איך לענות על שאלה כזו במבחן"
+    },
+    {
+      "type": "mental_model",
+      "content": "מודל מנטלי: 4-5 משפטים שהסטודנט יכול לחזור לחבר ברחוב"
+    },
+    {
+      "type": "missed_by_lecturer",
+      "items": ["💎 דבר חשוב שהמורה פספס — עם הסבר מלא"]
+    },
+    {
+      "type": "exam_traps",
+      "items": ["⚠️ מלכודת מבחן — עם הסבר מה לעשות במקום"]
+    }
+  ],
+  "formulas_tab": [
+    {
+      "name": "שם הנוסחה",
+      "latex": "נוסחה בלטקס",
+      "one_line": "הסבר בשורה אחת"
+    }
+  ],
+  "exercises_tab": [
+    {
+      "title": "שם התרגיל",
+      "problem": "השאלה",
+      "steps": [
+        {"text": "הסבר השלב", "latex": "נוסחה מדויקת"}
+      ],
+      "answer": "תשובה סופית"
+    }
+  ],
+  "key_points_tab": [
+    "🎯 נקודה חשובה — משפט אחד ברור"
+  ]
+}"""
+
+SUMMARIZE_FALLBACK_SYSTEM = """אתה מומחה לסיכום שיעורים. החזר JSON בלבד.
+כללים: LaTeX טהור בשדות latex/formula בלבד (אסור $ או $$). עברית פשוטה בכל שאר השדות.
+מבנה: {"title":"נושא","topics":["נושא"],"enriched":false,"sections":[
+{"type":"explanation","title":"כותרת","content":"הסבר"},
+{"type":"formula","title":"נוסחאות","formulas":[{"name":"שם","latex":"\\\\frac{a}{b}","meaning":"הסבר","source":"voice"}]},
+{"type":"exercise","title":"תרגיל","problem":"שאלה","steps":[{"step":1,"desc":"הסבר","formula":""}],"answer":"תשובה"},
+{"type":"highlight","title":"חשוב למבחן","points":["נקודה"]}
+],"formulas_tab":[],"exercises_tab":[],"key_points_tab":[]}"""
+
+
+async def _gpt(client: httpx.AsyncClient, system: str, user: str,
+               model: str = "gpt-4o", max_tokens: int = 1500) -> str:
+    r = await client.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"},
+        json={"model": model, "max_tokens": max_tokens,
+              "messages": [{"role": "system", "content": system},
+                           {"role": "user", "content": user}]}
+    )
+    r.raise_for_status()
+    return r.json()["choices"][0]["message"]["content"]
+
+
+def _parse_json(raw: str) -> dict:
+    m = re.search(r'\{[\s\S]*\}', raw)
+    return json.loads(m.group(0) if m else raw)
+
+
 @app.post("/summarize")
 async def summarize(req: Request):
     if not OPENAI_KEY:
@@ -133,12 +275,13 @@ async def summarize(req: Request):
 
     transcript = str(body.get("transcript", ""))[:MAX_TRANSCRIPT]
     screen_text = str(body.get("screen_text", ""))[:5000]
-    segments = body.get("segments", [])[:200]
-    shots_meta = body.get("shots_meta", [])[:50]
+    segments    = body.get("segments", [])[:200]
+    shots_meta  = body.get("shots_meta", [])[:50]
 
     if len(transcript) < 50:
         raise HTTPException(400, "התמלול קצר מדי לסיכום.")
 
+    # Build rich context string
     ctx = ""
     if segments:
         ctx = "=== תמלול ===\n"
@@ -153,89 +296,68 @@ async def summarize(req: Request):
     if screen_text:
         ctx += f"\n\n=== מסך ===\n{screen_text}"
 
-    system = """אתה המורה הטוב ביותר בעולם. תפקידך לקחת תמלול של שיעור אקדמי ולהפוך אותו לסיכום כל-כך טוב שאפילו הסטודנט החלש ביותר יבין הכל לעומק ויעבור את המבחן בקלות.
-
-עקרונות יסוד:
-- הסבר כל מושג כאילו הסטודנט שומע אותו בפעם הראשונה בחייו
-- לפני כל הגדרה פורמלית — תן הסבר אינטואיטיבי בשפה פשוטה עם דוגמה מהחיים
-- אל תדלג על שום שלב בהסברים — כל מה שנראה "ברור מאליו" חייב הסבר
-- כתוב עברית פשוטה, ברורה, חמה — לא שפת ספר לימוד
-- השתמש באנלוגיות יצירתיות שמחברות לחיי היומיום
-- כל נוסחה חייבת הסבר מילולי מלא + דוגמה מספרית עם חישוב שלב אחר שלב
-
-מבנה הסיכום שעליך לייצר:
-
-🎯 תמונה גדולה (2-3 משפטים)
-מה הנושא הזה עושה, למה הוא קיים, ואיך הוא קשור לעולם האמיתי.
-
-📖 לכל מושג/נושא בשיעור — בפורמט הזה:
-- מה זה בעצם? (הסבר אינטואיטיבי, 2-3 משפטים פשוטים)
-- דוגמה מהחיים (אנלוגיה שכל אחד מבין)
-- ההגדרה הפורמלית (אחרי שהבנו אינטואיטיבית)
-- לכל נוסחה: מה כל סמל אומר, מה הנוסחה מחשבת, ודוגמה מספרית מלאה עם כל שלב
-
-✏️ לכל תרגיל בשיעור:
-- פתרון מלא שלב אחר שלב עם הסבר בעברית לכל שלב
-- למה עשינו כל פעולה — לא רק מה, אלא למה
-
-🎯 נקודות זהב למבחן (5-10 נקודות):
-לא רק "מה חשוב" — אלא הסבר מלא לכל נקודה, כולל מה הבוחן בדרך כלל שואל ואיך לענות נכון
-
-🧠 מודל מנטלי (3-5 משפטים):
-הסבר כל-כך פשוט שהסטודנט יכול לספר את הנושא לחבר שלו ברחוב. בלי מונחים טכניים.
-
-כללים נוספים:
-- אם משהו הוסבר בצורה מבלבלת בשיעור — הסבר אותו מחדש בצורה טובה יותר
-- אם יש קשרים בין נושאים — ציין אותם מפורשות
-- השתמש בדוגמאות מספריות קונקרטיות לכל נוסחה, לא רק "נניח ש-x=..."
-- הוסף ⚠️ לפני כל דבר שסטודנטים בדרך כלל מתבלבלים בו
-- הוסף 💡 לפני תובנות שמאירות עיניים
-- הוסף 🔗 כשיש קשר לנושא אחר שכנראה כבר למדו
-- הפלט צריך להיות ארוך, מפורט ומעמיק — עדיף יותר מדי הסבר מדי מעט
-- כתוב הכל בעברית פשוטה וברורה
-
-═══════════════════════════════════════
-⚠️ כללי פורמט JSON — חובה לציית לחלוטין — החזר JSON בלבד, ללא טקסט נוסף:
-
-• שדה "latex" (בנוסחאות): LaTeX טהור בלבד, אסור $$ או $ — לדוגמה: \\int_a^b f(x)\\,dx
-• שדה "formula" (בצעדי תרגיל): LaTeX טהור בלבד, אסור $$ או $ — לדוגמה: \\Delta x = \\frac{b-a}{n}
-• שדה "meaning": עברית פשוטה בלבד, אסור $ בכלל, אסור LaTeX
-• שדה "desc": עברית פשוטה בלבד, אסור $ בכלל, אסור LaTeX
-• שדות content/title/problem/answer/points/hint/question: עברית פשוטה בלבד — כאן כתוב הסברים מפורטים ועשירים!
-
-מבנה JSON:
-{"title":"נושא","topics":["נושא"],"sections":[
-{"type":"explanation","title":"כותרת","content":"הסבר מפורט ועשיר בעברית פשוטה — כולל אינטואיציה, אנלוגיה, ⚠️ אזהרות, 💡 תובנות, 🔗 קשרים"},
-{"type":"formula","title":"נוסחאות","formulas":[{"name":"שם הנוסחה","latex":"\\\\frac{d}{dx}f(x)=f'(x)","meaning":"הסבר מילולי מלא של כל סמל ומה הנוסחה עושה, בעברית פשוטה ללא סימנים מתמטיים","source":"voice"}]},
-{"type":"exercise","title":"תרגיל","problem":"שאלה בעברית בלבד","steps":[{"step":1,"desc":"הסבר מפורט למה עושים את הצעד הזה, בעברית פשוטה","formula":"\\\\Delta x = \\\\frac{b-a}{n}"}],"answer":"תשובה מלאה עם הסבר בעברית"},
-{"type":"highlight","title":"חשוב למבחן","points":["נקודה חשובה עם הסבר מלא — לא רק כותרת"]}
-],"exercises":[{"question":"שאלה לתרגול","hint":"רמז מפורט שמכוון לפתרון"}]}"""
+    t_start = time.time()
 
     try:
-        async with httpx.AsyncClient(timeout=120) as client:
-            r = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"},
-                json={"model": "gpt-4o", "max_tokens": 4000,
-                      "messages": [{"role": "system", "content": system},
-                                   {"role": "user", "content": f"סכם:\n\n{ctx[:30000]}"}]}
-            )
+        async with httpx.AsyncClient(timeout=60) as client:
+
+            # ── STAGE 1: Knowledge enrichment ──────────────────────
+            enrichment_json = ""
+            enriched = False
+            try:
+                raw_enrich = await _gpt(client, ENRICH_SYSTEM,
+                                        f"נתח את השיעור הבא:\n\n{ctx[:20000]}",
+                                        model="gpt-4o", max_tokens=2000)
+                enrich_data = _parse_json(raw_enrich)
+                enrichment_json = json.dumps(enrich_data, ensure_ascii=False)
+                topics = enrich_data.get("topics", [])
+                print(f"[summarize] Stage 1 done. Topics: {topics}")
+                enriched = True
+            except Exception as e:
+                print(f"[summarize] Stage 1 enrichment failed (continuing without it): {e}")
+
+            # ── STAGE 2: Main summary generation ───────────────────
+            if enriched:
+                user_msg = (
+                    f"תמלול השיעור:\n{ctx[:20000]}\n\n"
+                    f"ניתוח הפרופסור המומחה:\n{enrichment_json[:8000]}"
+                )
+            else:
+                user_msg = f"סכם את השיעור הבא:\n\n{ctx[:28000]}"
+
+            raw_summary = await _gpt(client, SUMMARIZE_SYSTEM, user_msg,
+                                     model="gpt-4o", max_tokens=4500)
+
+        elapsed = round(time.time() - t_start, 1)
+
+        # ── STAGE 3: Parse with retry on bad JSON ──────────────
+        try:
+            result = _parse_json(raw_summary)
+        except Exception:
+            print(f"[summarize] JSON parse failed on main response — retrying with fallback prompt")
+            async with httpx.AsyncClient(timeout=60) as client2:
+                raw_fallback = await _gpt(client2, SUMMARIZE_FALLBACK_SYSTEM,
+                                          f"סכם:\n\n{ctx[:15000]}",
+                                          model="gpt-4o", max_tokens=3000)
+            try:
+                result = _parse_json(raw_fallback)
+            except Exception:
+                raise HTTPException(500, "שגיאה בפענוח הסיכום. נסה שוב.")
+
+        result["enriched"] = enriched
+        print(f"[summarize] Done in {elapsed}s — enriched={enriched}, sections={len(result.get('sections', []))}")
+        return result
+
+    except HTTPException:
+        raise
     except httpx.TimeoutException:
         raise HTTPException(504, "הסיכום לקח יותר מדי זמן. נסה שוב.")
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 429:
+            raise HTTPException(429, "יותר מדי בקשות. נסה שוב.")
+        raise HTTPException(e.response.status_code, f"שגיאה: {e.response.text[:150]}")
     except Exception as e:
         raise HTTPException(502, f"שגיאת חיבור: {str(e)[:80]}")
-
-    if r.status_code == 429:
-        raise HTTPException(429, "יותר מדי בקשות. נסה שוב.")
-    if r.status_code != 200:
-        raise HTTPException(r.status_code, f"שגיאה: {r.text[:150]}")
-
-    raw = r.json()["choices"][0]["message"]["content"]
-    m = re.search(r'\{[\s\S]*\}', raw)
-    try:
-        return json.loads(m.group(0) if m else raw)
-    except Exception:
-        raise HTTPException(500, "שגיאה בפענוח הסיכום. נסה שוב.")
 
 # ─── Compress ───────────────────────────────────────────────────
 @app.post("/compress")
