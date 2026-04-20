@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+import asyncio
 import httpx
 import os
 import json
@@ -194,6 +195,47 @@ async def summarize(req: Request):
         return json.loads(m.group(0) if m else raw)
     except Exception:
         raise HTTPException(500, "שגיאה בפענוח הסיכום. נסה שוב.")
+
+# ─── Compress ───────────────────────────────────────────────────
+@app.post("/compress")
+async def compress(req: Request):
+    if not OPENAI_KEY:
+        raise HTTPException(500, "API Key לא מוגדר")
+
+    try:
+        body = await req.json()
+    except Exception:
+        raise HTTPException(400, "JSON לא תקין")
+
+    chunks = [str(c)[:12000] for c in body.get("chunks", [])[:20] if isinstance(c, str) and c.strip()]
+    if not chunks:
+        raise HTTPException(400, "חסרים chunks")
+
+    system = """אתה בוט דחיסת טקסט חכם. קרא את הטקסט הבא וצמצם אותו ל-30% מגודלו המקורי.
+כללים:
+- שמור על כל המידע החשוב: נוסחאות, הגדרות, דוגמאות, מספרים
+- הסר: חזרות, מילות מעבר מיותרות, דיאלוג סתמי
+- שמור על עברית תקינה וזרימה טבעית
+- אל תסכם — רק דחוס ושמור את התוכן"""
+
+    async def compress_one(chunk: str) -> str:
+        try:
+            async with httpx.AsyncClient(timeout=60) as client:
+                r = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"},
+                    json={"model": "gpt-4o-mini", "max_tokens": 2000,
+                          "messages": [{"role": "system", "content": system},
+                                       {"role": "user", "content": chunk}]}
+                )
+            if r.status_code == 200:
+                return r.json()["choices"][0]["message"]["content"]
+        except Exception:
+            pass
+        return chunk  # fallback: return original
+
+    results = await asyncio.gather(*[compress_one(c) for c in chunks])
+    return {"compressed": list(results)}
 
 # ─── OCR ────────────────────────────────────────────────────────
 @app.post("/ocr")
