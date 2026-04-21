@@ -166,7 +166,8 @@ CHART FORMAT:
 ANIMATION FORMAT (full self-contained HTML with inline CSS animations):
 {"type":"animation","html":"<!DOCTYPE html><html><head><style>body{margin:0;background:#0d0b1e}...CSS...</style></head><body>...content...</body></html>","caption":"הסבר"}
 
-CRITICAL: Validate your JSON mentally before including it. SVG must be complete and valid. Only 1-2 visualizations per lecture maximum."""
+CRITICAL: Validate your JSON mentally before including it. SVG must be complete and valid. Only 1-2 visualizations per lecture maximum.
+CRITICAL JSON RULE: When writing SVG markup or LaTeX inside JSON strings, you MUST escape ALL backslashes as \\\\ (double backslash). Never use single backslash inside a JSON string value."""
 
 SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבלת תמלול שיעור ונתוח מועשר של פרופסור מומחה.
 צור סיכום עמוק ועשיר שהוא פי 1000 טוב מהשיעור עצמו.
@@ -235,6 +236,8 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
 }
 === סוף הדוגמה ===
 
+CRITICAL JSON RULE: When writing LaTeX inside JSON strings, you MUST escape ALL backslashes as \\\\ (double backslash). Never use single backslash inside a JSON string value.
+
 כעת צור סיכום מלא לשיעור שקיבלת, בדיוק באותו מבנה. השתמש בניתוח הפרופסור המומחה כדי להעשיר כל סקציית concept עם ai_enrichment, deeper_insight ו-analogy מעולים."""
 
 SUMMARIZE_FALLBACK_SYSTEM = """אתה מומחה לסיכום שיעורים. החזר JSON בלבד, ללא טקסט נוסף.
@@ -263,9 +266,17 @@ async def _gpt(client: httpx.AsyncClient, system: str, user: str,
     return r.json()["choices"][0]["message"]["content"]
 
 
+def _clean_json(text: str) -> str:
+    text = re.sub(r'```json\s*', '', text)
+    text = re.sub(r'```\s*', '', text)
+    text = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', text)
+    return text.strip()
+
+
 def _parse_json(raw: str) -> dict:
-    m = re.search(r'\{[\s\S]*\}', raw)
-    return json.loads(m.group(0) if m else raw)
+    cleaned = _clean_json(raw)
+    m = re.search(r'\{[\s\S]*\}', cleaned)
+    return json.loads(m.group(0) if m else cleaned)
 
 
 @app.post("/summarize")
