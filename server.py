@@ -145,6 +145,7 @@ ENRICH_SYSTEM = """אתה פרופסור בכיר עם ידע אנציקלופד
 For each concept or formula that benefits from a visual explanation, replace the null "visualization" with one of these objects. Only add when it GENUINELY helps — not for every concept.
 
 TYPE SELECTION RULES:
+⚠️ DESMOS = 2D ONLY. NEVER use f(x,y) syntax. Only valid: y=x^2, x^2+y^2=4, y>x^2. For any 3D or multivariable concept use SVG instead.
 - "desmos": ONLY for 2D math functions, curves, regions, inequalities, geometric shapes
 - "svg": for physics diagrams, chemistry, biology, flow charts, abstract concepts
 - "chart": for data comparisons — economics (supply/demand), statistics, time series
@@ -175,6 +176,7 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
 • ALLOWED ONLY (מותר בלבד): "big_picture", "concept", "formula", "exercise", "mental_model", "missed_by_lecturer", "exam_traps"
 • כל מושג מהשיעור חייב להופיע כסקציית "concept" עם כל השדות מלאים בפירוט מרבי.
 • NEVER output a section with type "explanation" or "highlight" — this will break the app.
+• formulas_tab ו-exercises_tab חייבים להכיל לפחות פריט אחד אם יש נוסחאות/תרגילים בשיעור — לעולם לא מחזירים מערך ריק אם יש תוכן רלוונטי
 • If the enrichment data contains a "visualization" object for a concept, copy it into the matching concept section as "visualization": {...}.
 
 ⚠️ כללי LaTeX — חובה:
@@ -227,7 +229,7 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
   "formulas_tab": [
     {"name": "נגזרת חלקית לפי x", "latex": "\\frac{\\partial f}{\\partial x}", "one_line": "שיעור השינוי לכיוון x תוך קיבוע y"}
   ],
-  "exercises_tab": [],
+  "exercises_tab": [{"title":"דוגמה","problem":"מצא תחום","steps":[{"explanation":"נדרוש x+y>=0","latex":"x+y\\geq 0"}],"conclusion":"התחום: x+y≥0","exam_tip":"לבדוק שורש ומכנה"}],
   "key_points_tab": ["התחום בשני משתנים הוא אזור 2D, לא קטע", "תמיד לבדוק שורש, מכנה ולוגריתם"]
 }
 === סוף הדוגמה ===
