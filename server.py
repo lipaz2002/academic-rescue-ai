@@ -242,27 +242,25 @@ async def _gpt(client: httpx.AsyncClient, system: str, user: str,
 
 
 def _parse_json(text: str):
-    logging.warning(f"[parse] RAW RESPONSE FIRST 1000: {text[:1000]}")
-    logging.warning(f"[parse] RAW RESPONSE LAST 500: {text[-500:]}")
+    if not text:
+        return None
     text = text.strip()
-
     if text.startswith("```"):
-        lines = text.split('\n')
-        lines = lines[1:]
-        if lines and lines[-1].strip() == '```':
-            lines = lines[:-1]
-        text = '\n'.join(lines).strip()
-
-    def fix_escapes(s):
-        return re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', s)
-
-    text_fixed = fix_escapes(text)
-
+        text = re.sub(r'^```(?:json)?\s*\n?', '', text)
+        text = re.sub(r'\n?```\s*$', '', text)
+        text = text.strip()
     try:
-        return json.loads(text_fixed)
+        return json.loads(text)
+    except:
+        pass
+    try:
+        fixed = text.replace('\\', '\\\\')
+        fixed = re.sub(r'\\\\(["\\/])', r'\\\1', fixed)
+        fixed = fixed.replace('\\\\n', '\\n')
+        fixed = fixed.replace('\\\\r', '\\r')
+        return json.loads(fixed)
     except Exception as e:
-        logging.warning(f"[parse] FAILED after fix: {e}")
-        logging.warning(f"[parse] Sample: {text_fixed[:200]}")
+        logging.warning(f"[parse] FAILED: {e}")
         return None
 
 
