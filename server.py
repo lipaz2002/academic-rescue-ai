@@ -9,6 +9,9 @@ import json
 import re
 import time
 import logging
+import math
+import subprocess
+import tempfile
 from collections import defaultdict
 
 app = FastAPI()
@@ -23,7 +26,9 @@ app.add_middleware(
 OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 # ─── הגנות ─────────────────────────────────────────────────────
-MAX_FILE_MB = 25
+MAX_FILE_MB = 500
+WHISPER_LIMIT_MB = 24
+CHUNK_TARGET_MB = 20
 RATE_PER_HOUR = 10
 RATE_PER_DAY = 30
 MAX_TRANSCRIPT = 50000
@@ -76,6 +81,81 @@ async def usage(request: Request):
         "limit_day": RATE_PER_DAY,
     }
 
+# ─── Audio chunking for large files ────────────────────────────
+async def _transcribe_chunked(content: bytes, filename: str, ct: str) -> dict:
+    suffix = ('.' + filename.split('.')[-1]) if '.' in filename else '.mp3'
+    tmp_path = None
+    chunk_files = []
+    try:
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as f:
+            f.write(content)
+            tmp_path = f.name
+
+        # Get duration via ffprobe
+        probe = subprocess.run(
+            ['ffprobe', '-v', 'error', '-show_entries', 'format=duration',
+             '-of', 'default=noprint_wrappers=1:nokey=1', tmp_path],
+            capture_output=True, text=True, timeout=30
+        )
+        duration = float(probe.stdout.strip())
+        file_mb = len(content) / 1024 / 1024
+        num_chunks = math.ceil(file_mb / CHUNK_TARGET_MB)
+        chunk_duration = duration / num_chunks
+
+        # Split with ffmpeg
+        base = tmp_path.replace(suffix, '')
+        chunk_pattern = base + '_chunk_%03d' + suffix
+        subprocess.run(
+            ['ffmpeg', '-i', tmp_path, '-f', 'segment',
+             '-segment_time', str(chunk_duration),
+             '-c', 'copy', '-reset_timestamps', '1', chunk_pattern],
+            capture_output=True, timeout=120
+        )
+
+        chunk_dir = os.path.dirname(tmp_path)
+        chunk_base = os.path.basename(base) + '_chunk_'
+        chunk_files = sorted([
+            os.path.join(chunk_dir, fn)
+            for fn in os.listdir(chunk_dir)
+            if fn.startswith(chunk_base)
+        ])
+
+        all_text = ""
+        all_segments = []
+        time_offset = 0.0
+
+        async with httpx.AsyncClient(timeout=180) as client:
+            for chunk_path in chunk_files:
+                with open(chunk_path, 'rb') as cf:
+                    chunk_bytes = cf.read()
+                r = await client.post(
+                    "https://api.openai.com/v1/audio/transcriptions",
+                    headers={"Authorization": f"Bearer {OPENAI_KEY}"},
+                    files={"file": (os.path.basename(chunk_path), chunk_bytes, ct or "audio/mpeg")},
+                    data={"model": "whisper-1", "language": "he",
+                          "response_format": "verbose_json",
+                          "timestamp_granularities[]": "segment"}
+                )
+                if r.status_code == 200:
+                    data = r.json()
+                    all_text += data.get('text', '') + ' '
+                    for seg in data.get('segments', []):
+                        seg['start'] += time_offset
+                        seg['end'] += time_offset
+                        all_segments.append(seg)
+                    if all_segments:
+                        time_offset = all_segments[-1]['end']
+
+        return {'text': all_text.strip(), 'segments': all_segments}
+    finally:
+        for p in chunk_files:
+            try: os.unlink(p)
+            except: pass
+        if tmp_path and os.path.exists(tmp_path):
+            try: os.unlink(tmp_path)
+            except: pass
+
+
 # ─── Transcribe ─────────────────────────────────────────────────
 @app.post("/transcribe")
 async def transcribe(request: Request, file: UploadFile = File(...)):
@@ -97,6 +177,16 @@ async def transcribe(request: Request, file: UploadFile = File(...)):
             ext in ["mp3","mp4","wav","m4a","webm","ogg","flac","aac"]):
         raise HTTPException(400, f"סוג קובץ לא נתמך.")
 
+    file_mb = len(content) / 1024 / 1024
+
+    # Large file: chunk via ffmpeg and transcribe each piece
+    if file_mb > WHISPER_LIMIT_MB:
+        try:
+            return await _transcribe_chunked(content, file.filename or "audio.mp3", ct)
+        except Exception as e:
+            raise HTTPException(500, f"שגיאה בעיבוד קובץ גדול: {str(e)[:120]}")
+
+    # Normal path: send directly to Whisper
     try:
         async with httpx.AsyncClient(timeout=180) as client:
             r = await client.post(
