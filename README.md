@@ -80,9 +80,9 @@ A "best teacher in the world" prompt combines the transcript and enrichment into
 
 ## 📱 Screenshots
 
-| Home | Summary | Formulas | Ask AI |
-|------|---------|----------|--------|
-| *(coming soon)* | *(coming soon)* | *(coming soon)* | *(coming soon)* |
+| Home | Summary | Formulas | Exercises | Ask AI |
+|------|---------|----------|-----------|--------|
+| ![Home](screenshots/home.png) | ![Summary](screenshots/summary.png) | ![Formulas](screenshots/formulas.png) | ![Exercises](screenshots/exercises.png) | ![Ask](screenshots/ask.png) |
 
 ---
 
