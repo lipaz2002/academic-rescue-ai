@@ -154,6 +154,17 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
 • כל מושג מהשיעור חייב להופיע כסקציית "concept" עם כל השדות מלאים בפירוט מרבי.
 • NEVER output a section with type "explanation" or "highlight" — this will break the app.
 • formulas_tab ו-exercises_tab חייבים להכיל לפחות פריט אחד אם יש נוסחאות/תרגילים בשיעור — לעולם לא מחזירים מערך ריק אם יש תוכן רלוונטי
+• For formula and concept sections, optionally add a "visualization" field.
+STRICT RULES — violations will crash the app:
+- type must be exactly "desmos"
+- expressions must use ONLY simple Desmos syntax — no backslashes whatsoever
+- Valid: y=x^2, y=sqrt(x), y=1/x, x^2+y^2=4, y>x, y=abs(x)
+- INVALID: anything with \frac, \sqrt, \theta, \sin — these break JSON
+- If you cannot express it without backslashes, omit the visualization entirely
+- viewport is optional: {"xmin": -5, "xmax": 5, "ymin": -2, "ymax": 10}
+- caption is a short Hebrew description
+- Example: {"type":"desmos","expressions":[{"id":"1","latex":"y=x^2","color":"#7c6dff"},{"id":"2","latex":"y=0","color":"#00d97e"}],"viewport":{"xmin":-5,"xmax":5,"ymin":-2,"ymax":10},"caption":"גרף הפרבולה"}
+- Only add 1-2 visualizations per summary maximum. When in doubt, omit.
 
 ⚠️ כללי LaTeX — חובה:
 • שדות "latex" ו-"formula": LaTeX טהור בלבד — אסור $$ או $ — לדוגמה: \\frac{d}{dx}f(x)
