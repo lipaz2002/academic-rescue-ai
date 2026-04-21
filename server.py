@@ -8,6 +8,7 @@ import os
 import json
 import re
 import time
+import logging
 from collections import defaultdict
 
 app = FastAPI()
@@ -348,6 +349,8 @@ async def summarize(req: Request):
         # ── STAGE 3: Parse with retry on bad JSON ──────────────
         try:
             result = _parse_json(raw_summary)
+            logging.warning(f"SECTIONS: {[s.get('type') for s in result.get('sections', [])]}")
+            logging.warning(f"VIZ: {any(s.get('visualization') for s in result.get('sections', []))}")
         except Exception:
             print(f"[summarize] JSON parse failed on main response — retrying with fallback prompt")
             async with httpx.AsyncClient(timeout=60) as client2:
