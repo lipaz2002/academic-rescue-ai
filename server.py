@@ -238,26 +238,37 @@ async def _gpt(client: httpx.AsyncClient, system: str, user: str,
     return r.json()["choices"][0]["message"]["content"]
 
 
-def _parse_json(text: str) -> dict:
+def _parse_json(text: str):
     logging.warning(f"[parse] RAW RESPONSE FIRST 1000: {text[:1000]}")
     logging.warning(f"[parse] RAW RESPONSE LAST 500: {text[-500:]}")
     text = text.strip()
     if text.startswith("```"):
-        text = re.sub(r'^```(?:json)?\s*\n?', '', text)
-        text = re.sub(r'\n?```\s*$', '', text)
-    text = text.strip()
+        text = text[text.index('\n')+1:] if '\n' in text else text[3:]
+        if text.endswith("```"):
+            text = text[:-3].strip()
+
+    def fix_backslashes(s):
+        result = []
+        i = 0
+        while i < len(s):
+            if s[i] == '\\':
+                if i + 1 < len(s) and s[i+1] in ('"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u'):
+                    result.append(s[i])
+                else:
+                    result.append('\\\\')
+                i += 1
+            else:
+                result.append(s[i])
+            i += 1
+        return ''.join(result)
+
+    cleaned = fix_backslashes(text)
     try:
-        return json.loads(text)
+        return json.loads(cleaned)
     except Exception as e:
-        logging.warning(f"[parse] FAILED: {type(e).__name__}: {e}")
-        logging.warning(f"[parse] First 500 chars: {text[:500]}")
-        match = re.search(r'\{[\s\S]*\}', text)
-        if match:
-            try:
-                return json.loads(match.group())
-            except Exception as e2:
-                logging.warning(f"[parse] Fallback also failed: {e2}")
-    return None
+        logging.warning(f"[parse] FAILED: {e}")
+        logging.warning(f"[parse] First 500 chars: {cleaned[:500]}")
+        return None
 
 
 @app.post("/summarize")
