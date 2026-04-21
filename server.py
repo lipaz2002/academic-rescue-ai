@@ -350,6 +350,10 @@ async def summarize(req: Request):
             if result is None:
                 raise HTTPException(500, "שגיאה בפענוח הסיכום. נסה שוב.")
         logging.warning(f"SECTIONS: {[s.get('type') for s in result.get('sections', [])]}")
+        logging.warning(f"VIZ: {any(s.get('visualization') for s in result.get('sections', []))}")
+        for s in result.get('sections', []):
+            if s.get('visualization'):
+                logging.warning(f"[VIZ DATA] type={s['visualization'].get('type')} data={str(s['visualization'])[:300]}")
 
         result["enriched"] = enriched
         print(f"[summarize] Done in {elapsed}s — enriched={enriched}, sections={len(result.get('sections', []))}")
