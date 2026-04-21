@@ -242,32 +242,24 @@ def _parse_json(text: str):
     logging.warning(f"[parse] RAW RESPONSE FIRST 1000: {text[:1000]}")
     logging.warning(f"[parse] RAW RESPONSE LAST 500: {text[-500:]}")
     text = text.strip()
+
     if text.startswith("```"):
-        text = text[text.index('\n')+1:] if '\n' in text else text[3:]
-        if text.endswith("```"):
-            text = text[:-3].strip()
+        lines = text.split('\n')
+        lines = lines[1:]
+        if lines and lines[-1].strip() == '```':
+            lines = lines[:-1]
+        text = '\n'.join(lines).strip()
 
-    def fix_backslashes(s):
-        result = []
-        i = 0
-        while i < len(s):
-            if s[i] == '\\':
-                if i + 1 < len(s) and s[i+1] in ('"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u'):
-                    result.append(s[i])
-                else:
-                    result.append('\\\\')
-                i += 1
-            else:
-                result.append(s[i])
-            i += 1
-        return ''.join(result)
+    def fix_escapes(s):
+        return re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', s)
 
-    cleaned = fix_backslashes(text)
+    text_fixed = fix_escapes(text)
+
     try:
-        return json.loads(cleaned)
+        return json.loads(text_fixed)
     except Exception as e:
-        logging.warning(f"[parse] FAILED: {e}")
-        logging.warning(f"[parse] First 500 chars: {cleaned[:500]}")
+        logging.warning(f"[parse] FAILED after fix: {e}")
+        logging.warning(f"[parse] Sample: {text_fixed[:200]}")
         return None
 
 
