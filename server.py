@@ -241,6 +241,8 @@ async def _gpt(client: httpx.AsyncClient, system: str, user: str,
 
 
 def _parse_json(text: str) -> dict:
+    logging.warning(f"[parse] RAW RESPONSE FIRST 1000: {text[:1000]}")
+    logging.warning(f"[parse] RAW RESPONSE LAST 500: {text[-500:]}")
     text = re.sub(r'^```(?:json)?\s*', '', text.strip(), flags=re.MULTILINE)
     text = re.sub(r'\s*```$', '', text.strip(), flags=re.MULTILINE)
     text = text.strip()
