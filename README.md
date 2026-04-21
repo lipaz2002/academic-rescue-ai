@@ -82,7 +82,7 @@ A "best teacher in the world" prompt combines the transcript and enrichment into
 
 | Home | Summary | Formulas | Exercises | Ask AI |
 |------|---------|----------|-----------|--------|
-| ![Home](screenshots/home.PNG) | ![Summary](screenshots/summary.PNG) | ![Formulas](screenshots/formulas.PNG) | ![Exercises](screenshots/exercises.PNG) | ![Ask AI](screenshots/ask.PNG) |
+| ![Home](screenshots/home.png) | ![Summary](screenshots/summary.png) | ![Formulas](screenshots/formulas.png) | ![Exercises](screenshots/exercises.png) | ![Ask AI](screenshots/ask.png) |
 
 ---
 
