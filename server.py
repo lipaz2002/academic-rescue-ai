@@ -226,13 +226,16 @@ FORBIDDEN section types: "explanation", "highlight" — אסור לחלוטין.
 
 async def _gpt(client: httpx.AsyncClient, system: str, user: str,
                model: str = "gpt-4o", max_tokens: int = 1500,
-               temperature: float = 0.7) -> str:
+               temperature: float = 0.7, json_mode: bool = False) -> str:
+    body = {"model": model, "max_tokens": max_tokens, "temperature": temperature,
+            "messages": [{"role": "system", "content": system},
+                         {"role": "user", "content": user}]}
+    if json_mode:
+        body["response_format"] = {"type": "json_object"}
     r = await client.post(
         "https://api.openai.com/v1/chat/completions",
         headers={"Authorization": f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"},
-        json={"model": model, "max_tokens": max_tokens, "temperature": temperature,
-              "messages": [{"role": "system", "content": system},
-                           {"role": "user", "content": user}]}
+        json=body
     )
     r.raise_for_status()
     return r.json()["choices"][0]["message"]["content"]
@@ -309,7 +312,7 @@ async def summarize(req: Request):
             try:
                 raw_enrich = await _gpt(client, ENRICH_SYSTEM,
                                         f"נתח את השיעור הבא:\n\n{ctx[:20000]}",
-                                        model="gpt-4o", max_tokens=2000)
+                                        model="gpt-4o", max_tokens=2000, json_mode=True)
                 enrich_data = _parse_json(raw_enrich)
                 enrichment_json = json.dumps(enrich_data, ensure_ascii=False)
                 topics = enrich_data.get("topics", [])
@@ -337,7 +340,7 @@ async def summarize(req: Request):
                 )
 
             raw_summary = await _gpt(client, SUMMARIZE_SYSTEM, user_msg,
-                                     model="gpt-4o", max_tokens=4500, temperature=0.3)
+                                     model="gpt-4o", max_tokens=4500, temperature=0.3, json_mode=True)
 
         elapsed = round(time.time() - t_start, 1)
 
@@ -348,7 +351,7 @@ async def summarize(req: Request):
             async with httpx.AsyncClient(timeout=60) as client2:
                 raw_fallback = await _gpt(client2, SUMMARIZE_FALLBACK_SYSTEM,
                                           f"סכם:\n\n{ctx[:15000]}",
-                                          model="gpt-4o", max_tokens=3000)
+                                          model="gpt-4o", max_tokens=3000, json_mode=True)
             result = _parse_json(raw_fallback)
             if result is None:
                 raise HTTPException(500, "שגיאה בפענוח הסיכום. נסה שוב.")
