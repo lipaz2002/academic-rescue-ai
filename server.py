@@ -133,8 +133,7 @@ ENRICH_SYSTEM = """אתה פרופסור בכיר עם ידע אנציקלופד
       "best_analogy": "האנלוגיה הטובה ביותר מהעולם האמיתי",
       "concrete_example": "דוגמה מספרית או קונקרטית מלאה",
       "common_mistakes": ["טעות נפוצה 1", "טעות נפוצה 2"],
-      "deeper_insight": "תובנה עמוקה שהמורה לא ציין",
-      "visualization": null
+      "deeper_insight": "תובנה עמוקה שהמורה לא ציין"
     }
   ],
   "missed_by_lecturer": ["דבר חשוב שהמורה פספס או הסביר בצורה גרועה"],
@@ -143,31 +142,7 @@ ENRICH_SYSTEM = """אתה פרופסור בכיר עם ידע אנציקלופד
   "exam_traps": ["מלכודות מבחן נפוצות בנושא זה"]
 }
 
-For each concept or formula that benefits from a visual explanation, replace the null "visualization" with one of these objects. Only add when it GENUINELY helps — not for every concept.
-
-TYPE SELECTION RULES:
-⚠️ DESMOS = 2D ONLY. NEVER use f(x,y) syntax. Only valid: y=x^2, x^2+y^2=4, y>x^2. For any 3D or multivariable concept use SVG instead.
-- "desmos": ONLY for 2D math functions, curves, regions, inequalities, geometric shapes
-- "svg": for physics diagrams, chemistry, biology, flow charts, abstract concepts
-- "chart": for data comparisons — economics (supply/demand), statistics, time series
-- "animation": for dynamic processes — wave motion, pendulum, electric current
-
-DESMOS FORMAT (expressions must be valid JSON):
-{"type":"desmos","expressions":[{"id":"1","latex":"y=x^2","color":"#7c6dff"},{"id":"2","latex":"y=0","color":"#00d97e","lineStyle":"DASHED"}],"viewport":{"xmin":-5,"xmax":5,"ymin":-3,"ymax":10},"caption":"פרבולה y=x²"}
-
-SVG FORMAT (complete, self-contained, viewBox="0 0 400 280", background #0d0b1e, Hebrew text):
-{"type":"svg","markup":"<svg viewBox=\\"0 0 400 280\\" xmlns=\\"http://www.w3.org/2000/svg\\" style=\\"background:#0d0b1e;border-radius:12px\\">...beautiful SVG with Hebrew labels...</svg>","caption":"תיאור"}
-
-SVG COLOR PALETTE: background #0d0b1e, primary #7c6dff, success #00d97e, warning #f59e0b, danger #ff4060, info #06b6d4, text #e2e8f0, subtle #64748b. Use gradients and shadows. Make it beautiful.
-
-CHART FORMAT:
-{"type":"chart","chartType":"line","labels":["א","ב","ג"],"datasets":[{"label":"היצע","data":[10,20,30],"color":"#7c6dff"}],"xLabel":"כמות","yLabel":"מחיר","caption":"גרף"}
-
-ANIMATION FORMAT (full self-contained HTML with inline CSS animations):
-{"type":"animation","html":"<!DOCTYPE html><html><head><style>body{margin:0;background:#0d0b1e}...CSS...</style></head><body>...content...</body></html>","caption":"הסבר"}
-
-CRITICAL: Validate your JSON mentally before including it. SVG must be complete and valid. Only 1-2 visualizations per lecture maximum.
-CRITICAL JSON RULE: When writing SVG markup or LaTeX inside JSON strings, you MUST escape ALL backslashes as \\\\ (double backslash). Never use single backslash inside a JSON string value."""
+CRITICAL: Return only valid JSON. Do not include any text outside the JSON object."""
 
 SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבלת תמלול שיעור ונתוח מועשר של פרופסור מומחה.
 צור סיכום עמוק ועשיר שהוא פי 1000 טוב מהשיעור עצמו.
@@ -179,7 +154,6 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
 • כל מושג מהשיעור חייב להופיע כסקציית "concept" עם כל השדות מלאים בפירוט מרבי.
 • NEVER output a section with type "explanation" or "highlight" — this will break the app.
 • formulas_tab ו-exercises_tab חייבים להכיל לפחות פריט אחד אם יש נוסחאות/תרגילים בשיעור — לעולם לא מחזירים מערך ריק אם יש תוכן רלוונטי
-• If the enrichment data contains a "visualization" object for a concept, copy it into the matching concept section as "visualization": {...}.
 
 ⚠️ כללי LaTeX — חובה:
 • שדות "latex" ו-"formula": LaTeX טהור בלבד — אסור $$ או $ — לדוגמה: \\frac{d}{dx}f(x)
@@ -266,17 +240,22 @@ async def _gpt(client: httpx.AsyncClient, system: str, user: str,
     return r.json()["choices"][0]["message"]["content"]
 
 
-def _clean_json(text: str) -> str:
-    text = re.sub(r'```json\s*', '', text)
-    text = re.sub(r'```\s*', '', text)
-    text = re.sub(r'\\(?!["\\/bfnrtu])', r'\\\\', text)
-    return text.strip()
-
-
-def _parse_json(raw: str) -> dict:
-    cleaned = _clean_json(raw)
-    m = re.search(r'\{[\s\S]*\}', cleaned)
-    return json.loads(m.group(0) if m else cleaned)
+def _parse_json(text: str) -> dict:
+    text = re.sub(r'^```(?:json)?\s*', '', text.strip(), flags=re.MULTILINE)
+    text = re.sub(r'\s*```$', '', text.strip(), flags=re.MULTILINE)
+    text = text.strip()
+    try:
+        return json.loads(text)
+    except Exception as e:
+        logging.warning(f"[parse] FAILED: {type(e).__name__}: {e}")
+        logging.warning(f"[parse] First 500 chars: {text[:500]}")
+        match = re.search(r'\{[\s\S]*\}', text)
+        if match:
+            try:
+                return json.loads(match.group())
+            except Exception as e2:
+                logging.warning(f"[parse] Fallback also failed: {e2}")
+    return None
 
 
 @app.post("/summarize")
@@ -358,20 +337,17 @@ async def summarize(req: Request):
         elapsed = round(time.time() - t_start, 1)
 
         # ── STAGE 3: Parse with retry on bad JSON ──────────────
-        try:
-            result = _parse_json(raw_summary)
-            logging.warning(f"SECTIONS: {[s.get('type') for s in result.get('sections', [])]}")
-            logging.warning(f"VIZ: {any(s.get('visualization') for s in result.get('sections', []))}")
-        except Exception:
-            print(f"[summarize] JSON parse failed on main response — retrying with fallback prompt")
+        result = _parse_json(raw_summary)
+        if result is None:
+            logging.warning(f"[summarize] JSON parse failed on main response — retrying with fallback prompt")
             async with httpx.AsyncClient(timeout=60) as client2:
                 raw_fallback = await _gpt(client2, SUMMARIZE_FALLBACK_SYSTEM,
                                           f"סכם:\n\n{ctx[:15000]}",
                                           model="gpt-4o", max_tokens=3000)
-            try:
-                result = _parse_json(raw_fallback)
-            except Exception:
+            result = _parse_json(raw_fallback)
+            if result is None:
                 raise HTTPException(500, "שגיאה בפענוח הסיכום. נסה שוב.")
+        logging.warning(f"SECTIONS: {[s.get('type') for s in result.get('sections', [])]}")
 
         result["enriched"] = enriched
         print(f"[summarize] Done in {elapsed}s — enriched={enriched}, sections={len(result.get('sections', []))}")
