@@ -210,8 +210,6 @@ SUMMARIZE_SYSTEM = """אתה המורה הטוב ביותר בעולם. קיבל
 }
 === סוף הדוגמה ===
 
-CRITICAL JSON RULE: When writing LaTeX inside JSON strings, you MUST escape ALL backslashes as \\\\ (double backslash). Never use single backslash inside a JSON string value.
-
 כעת צור סיכום מלא לשיעור שקיבלת, בדיוק באותו מבנה. השתמש בניתוח הפרופסור המומחה כדי להעשיר כל סקציית concept עם ai_enrichment, deeper_insight ו-analogy מעולים."""
 
 SUMMARIZE_FALLBACK_SYSTEM = """אתה מומחה לסיכום שיעורים. החזר JSON בלבד, ללא טקסט נוסף.
@@ -349,14 +347,15 @@ async def summarize(req: Request):
             result = _parse_json(raw_fallback)
             if result is None:
                 raise HTTPException(500, "שגיאה בפענוח הסיכום. נסה שוב.")
-        logging.warning(f"SECTIONS: {[s.get('type') for s in result.get('sections', [])]}")
-        logging.warning(f"VIZ: {any(s.get('visualization') for s in result.get('sections', []))}")
-        for s in result.get('sections', []):
-            if s.get('visualization'):
-                logging.warning(f"[VIZ DATA] type={s['visualization'].get('type')} data={str(s['visualization'])[:300]}")
+        try:
+            sections = result.get('sections', [])
+            logging.warning(f"SECTIONS: {[s.get('type') for s in sections]}")
+        except Exception as e:
+            logging.warning(f"[summarize] Error reading sections: {e}")
+            sections = []
 
         result["enriched"] = enriched
-        print(f"[summarize] Done in {elapsed}s — enriched={enriched}, sections={len(result.get('sections', []))}")
+        print(f"[summarize] Done in {elapsed}s — enriched={enriched}, sections={len(sections)}")
         return result
 
     except HTTPException:
